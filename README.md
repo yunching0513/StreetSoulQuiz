@@ -23,8 +23,10 @@
 ## 🌐 線上體驗
 
 - **測驗網站**：[https://你的網域/](#) ← 部署後填入
+- **世界街道靈魂地圖**：[https://你的網域/world.html](#) ← 全世界參與者的分布
 - **統計儀表板**：[https://你的網域/dashboard.html](#)
 - **嵌入版本**：`/dashboard.html?embed=1`（可用 iframe 嵌入）
+- **版面預覽**：`/world.html?demo=1`（用示範資料看版面，會有明顯的假資料標示）
 
 ---
 
@@ -33,7 +35,9 @@
 ```
 .
 ├── index.html          # 測驗主網頁
+├── world.html          # 世界街道靈魂地圖（社群感，讀同一份 CSV）
 ├── dashboard.html      # 即時統計儀表板（讀 Google Sheet CSV）
+├── config.js           # ★ 唯一需要填設定的檔案（CSV 網址、樣本門檻）
 ├── README.md           # 本文件
 ├── LICENSE             # CC BY-SA 4.0
 └── .nojekyll           # GitHub Pages 設定（避免 Jekyll 處理）
@@ -48,9 +52,23 @@
 - **HTML / CSS / Vanilla JS** — 無框架，2 秒內載入
 - **html2canvas** — 結果頁產生 IG 比例分享圖卡（CDN 引入）
 - **Google Apps Script** — 接收測驗結果，寫入 Google Sheet（fire-and-forget webhook）
-- **Google Sheet CSV** — 儀表板資料源，每 60 秒自動更新
+- **Google Sheet CSV** — 儀表板與世界地圖的資料源，每 60 秒自動更新
+- **內嵌世界底圖** — `world.html` 的海岸線是 Natural Earth 資料預先轉成的 SVG path，
+  直接寫在檔案裡，**不需要任何地圖函式庫或 CDN**，CDN 掛掉也不會破版
 
 整個系統的後端就是一份 Google 試算表。便宜、簡單、可審視。
+
+### 世界地圖怎麼避免說錯話
+
+`world.html` 會自動從資料生出一句跨國比較的結論（例如「在荷蘭 78% 的人偏向『漫』，
+在韓國只有 26%」）。為了避免小樣本生出誤導性的數字，這句話要同時通過三關才會出現：
+
+1. 兩邊的樣本數都 ≥ `INSIGHT_MIN`（預設 30）
+2. 兩比例 z 檢定 z ≥ 1.96（雙尾 p < .05）
+3. 差距至少 8 個百分點
+
+任何一關沒過，就顯示「資料還在累積中」而不是硬掰一個結論。
+各國卡片的樣本數低於 `MIN_SAMPLE`（預設 20）時會淡化顯示、不給結論，但仍然計入總數。
 
 ---
 
@@ -62,10 +80,14 @@
 - Netlify / Vercel / Cloudflare Pages
 - 自家網站 / 任何能放 HTML 的地方
 
-部署前需設定兩個變數：
+部署前需設定：
 
-1. **`SHEET_WEBHOOK_URL`**（在 `index.html`）— Google Apps Script 部署的 webhook URL
-2. **`SHEET_CSV_URL`**（在 `dashboard.html`）— Google Sheet 發佈成 CSV 的 URL
+1. **`SHEET_CSV_URL`**（在 `config.js`）— Google Sheet 發佈成 CSV 的 URL。
+   `world.html`、`dashboard.html`、`index.html` 的世界地圖區塊全部讀這一個設定，只要填一次。
+   取得方式：試算表 → 檔案 → 共用 → 發布到網路 → 逗號分隔值 (.csv) → 發布。
+2. **`SHEET_WEBHOOK_URL`**（在 `index.html`）— Google Apps Script 部署的 webhook URL（寫入用）
+
+沒填 `SHEET_CSV_URL` 也不會壞：世界地圖會顯示設定說明，測驗結果頁的世界地圖區塊則整塊隱藏。
 
 完整設定教學請洽專案維護者。
 
@@ -122,6 +144,9 @@
 - **發起**：Vision Zero Taiwan（社團法人還路於民行人路權促進會）
 - **發起**：TCAN（台灣氣候行動網路）
 - **整理製作**：Yun Ching Wu
+
+地圖底圖：[Natural Earth](https://www.naturalearthdata.com/)（public domain），
+經 [world-atlas](https://github.com/topojson/world-atlas)（ISC）轉出。
 
 街道安全 ✦ 氣候行動 ✦ 一起來
 

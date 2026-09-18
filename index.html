@@ -791,6 +791,20 @@ body.picking #lang-pick{display:block!important}
 .sound-toggle.muted{background:var(--g4);color:var(--g2)}
 
 /* ===== ATLAS · 本次倡議最重要的成果（hero 卡） ===== */
+/* WORLD PEEK · 和你同型的人在世界的哪裡（讀 Sheet CSV，失敗就整塊移除） */
+.world-peek{background:var(--white);border:1.5px solid var(--black);border-radius:20px;padding:22px 22px 20px;margin-bottom:14px;animation:fadeUp .55s cubic-bezier(.16,1,.3,1) backwards}
+.wp-label{font-family:var(--en);font-size:9.5px;font-weight:700;letter-spacing:.2em;color:var(--g2, #8a8a8a);margin-bottom:10px}
+.wp-title{font-size:19px;font-weight:700;line-height:1.45;margin-bottom:6px}
+.wp-title .wp-em{font-size:24px;vertical-align:-3px;margin-right:2px}
+.wp-sub{font-size:13px;color:#4A4A4A;line-height:1.7;margin-bottom:15px}
+.wp-places{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.wp-chip{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--black);border-radius:100px;padding:5px 12px;font-size:12.5px;background:var(--cream)}
+.wp-chip b{font-family:var(--en);font-size:12px}
+.wp-cta{display:flex;align-items:center;justify-content:space-between;gap:12px;text-decoration:none;color:var(--black);background:var(--lime);border:2px solid var(--black);border-radius:14px;padding:14px 18px;font-weight:700;font-size:14.5px;transition:.2s}
+.wp-cta:hover{transform:translateY(-2px);box-shadow:4px 4px 0 var(--black)}
+.wp-cta .wp-arrow{transition:.2s}
+.wp-cta:hover .wp-arrow{transform:translateX(4px)}
+@media (max-width:560px){.world-peek{padding:18px 16px 16px}.wp-title{font-size:17px}}
 .atlas-card{display:block;text-decoration:none;color:var(--white);background:var(--ink);border:2px solid var(--black);border-radius:22px;margin-bottom:14px;overflow:hidden;position:relative;transition:.22s;animation:fadeUp .55s cubic-bezier(.16,1,.3,1) backwards}
 .atlas-card::after{content:'';position:absolute;top:-40%;right:-25%;width:80%;height:170%;background:radial-gradient(ellipse,var(--lime) 0%,transparent 62%);opacity:.18;pointer-events:none}
 .atlas-card:hover{transform:translateY(-3px);box-shadow:6px 6px 0 var(--lime-dk)}
@@ -1113,6 +1127,7 @@ body.picking #lang-pick{display:block!important}
 
 <div class="toast" id="toast"></div>
 
+<script src="config.js" onerror="window.SSQ_CONFIG=window.SSQ_CONFIG||{}"></script>
 <script>
 /* Trilingual helper — returns 'zh' | 'en' | 'ja' from the <body> class */
 function getLang(){return document.body.classList.contains('ja')?'ja':(document.body.classList.contains('en')?'en':'zh');}
@@ -2491,6 +2506,141 @@ function renderReadingTabs(){
 `;
 }
 
+/* ============================
+   WORLD PEEK · 和你同型的人在世界的哪裡
+   讀 dashboard/world 共用的 Sheet CSV（彙總統計，無個資）。
+   拿不到資料、或還沒有同型的人，就把整塊移除，不留空殼。
+   ============================ */
+const TW_CITY_EN = {
+  '台北市':'Taipei','新北市':'New Taipei','桃園市':'Taoyuan','台中市':'Taichung',
+  '台南市':'Tainan','高雄市':'Kaohsiung','基隆市':'Keelung','新竹市':'Hsinchu City',
+  '新竹縣':'Hsinchu County','苗栗縣':'Miaoli','彰化縣':'Changhua','南投縣':'Nantou',
+  '雲林縣':'Yunlin','嘉義市':'Chiayi City','嘉義縣':'Chiayi County','屏東縣':'Pingtung',
+  '宜蘭縣':'Yilan','花蓮縣':'Hualien','台東縣':'Taitung','澎湖縣':'Penghu',
+  '金門縣':'Kinmen','連江縣':'Lienchiang'
+};
+
+function renderWorldPeek(code){
+  // 佔位容器；loadWorldPeek() 填內容或整塊移除
+  return '<div class="world-peek" id="worldPeek" style="display:none"></div>';
+}
+
+async function loadWorldPeek(code){
+  const box = document.getElementById('worldPeek');
+  if(!box) return;
+  const drop = ()=>{ if(box && box.parentNode) box.parentNode.removeChild(box); };
+
+  const cfg = window.SSQ_CONFIG || {};
+  const url = cfg.SHEET_CSV_URL || '';
+  if(!url || url.indexOf('PASTE_YOUR') >= 0){ drop(); return; }
+
+  let rows;
+  try{
+    const sep = url.indexOf('?') >= 0 ? '&' : '?';
+    const res = await fetch(url + sep + 'cb=' + Date.now());
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    rows = peekParseCSV(await res.text());
+  }catch(err){
+    console.log('World peek unavailable (non-blocking):', err);
+    drop(); return;
+  }
+
+  const PLACES = {
+    TW:['🇹🇼','台灣','Taiwan','台湾'], JP:['🇯🇵','日本','Japan','日本'],
+    KR:['🇰🇷','韓國','South Korea','韓国'], HK:['🇭🇰','香港','Hong Kong','香港'],
+    SG:['🇸🇬','新加坡','Singapore','シンガポール'], MY:['🇲🇾','馬來西亞','Malaysia','マレーシア'],
+    CN:['🇨🇳','中國','China','中国'], US:['🇺🇸','美國','USA','アメリカ'],
+    CA:['🇨🇦','加拿大','Canada','カナダ'], UK:['🇬🇧','英國','UK','イギリス'],
+    DE:['🇩🇪','德國','Germany','ドイツ'], FR:['🇫🇷','法國','France','フランス'],
+    NL:['🇳🇱','荷蘭','Netherlands','オランダ'], AU:['🇦🇺','澳洲','Australia','オーストラリア'],
+    OTHER:['🌍','其他地區','Elsewhere','その他の地域']
+  };
+  const lang = getLang();
+  const pick = (zh,en,ja)=> lang==='en' ? en : lang==='ja' ? ja : zh;
+  const li = lang==='en' ? 2 : lang==='ja' ? 3 : 1;
+
+  // 同型者的地點分布：台灣拆到縣市，其他到國家
+  let same = 0, countries = {}, spots = {};
+  rows.forEach(r=>{
+    if((r.type_code||'').toUpperCase() !== code) return;
+    same++;
+    let cc = (r.country||'').trim().toUpperCase();
+    if(!cc) return;
+    if(!PLACES[cc]) cc = 'OTHER';
+    countries[cc] = true;
+    const city = (r.city||'').trim();
+    const key = (cc === 'TW' && city) ? 'TW|' + city : cc;
+    spots[key] = (spots[key]||0) + 1;
+  });
+  if(same < 1){ drop(); return; }
+
+  const t = TYPES[code], tj = TYPES_JA[code] || {};
+  const tName = pick(t.zh_name, t.en_name, tj.name || t.zh_name);
+  const nCountry = Object.keys(countries).length;
+
+  const chips = Object.entries(spots).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([key,n])=>{
+    let label;
+    if(key.indexOf('TW|') === 0){
+      const zhCity = key.slice(3);
+      label = '🇹🇼 ' + escapeHtml(lang === 'en' ? (TW_CITY_EN[zhCity] || zhCity) : zhCity);
+    }
+    else { const p = PLACES[key] || PLACES.OTHER; label = p[0] + ' ' + p[li]; }
+    return '<span class="wp-chip">' + label + ' <b>' + n + '</b></span>';
+  }).join('');
+
+  const rare = same < 3;
+  const title = rare
+    ? pick('目前全世界只記錄到 ' + same + ' 位' + tName + '，你是其中之一。',
+           'Only ' + same + ' ' + tName + (same===1?'':'s') + ' recorded worldwide so far — you are one of them.',
+           '世界でまだ' + same + '人しか記録されていない' + tName + '。あなたはそのひとりです。')
+    : pick('全世界有 ' + same.toLocaleString() + '位跟你一樣的' + tName + '。',
+           same.toLocaleString() + ' people worldwide share your soul: ' + tName + '.',
+           '世界には、あなたと同じ' + tName + 'が' + same.toLocaleString() + '人います。');
+
+  const sub = pick(
+    '分布在 ' + nCountry + ' 個國家／地區。你不是唯一一個這樣看待街道的人。',
+    'Across ' + nCountry + ' countries and regions. You are not the only one who sees streets this way.',
+    nCountry + 'の国・地域に広がっています。街をこんなふうに見ているのは、あなただけではありません。');
+
+  box.innerHTML =
+    '<div class="wp-label">YOU ARE NOT ALONE' + pick(' · 你不是一個人','',' · ひとりじゃない') + '</div>' +
+    '<div class="wp-title"><span class="wp-em">' + t.emoji + '</span>' + title + '</div>' +
+    '<div class="wp-sub">' + sub + '</div>' +
+    (chips ? '<div class="wp-places">' + chips + '</div>' : '') +
+    '<a class="wp-cta" href="world.html' + (lang==='zh' ? '' : '?lang=' + lang) + '" onclick="SFX.pop()">' +
+      '<span>🗺️ ' + pick('打開世界街道靈魂地圖','Open the World Street Soul Map','世界ストリートソウルマップを開く') + '</span>' +
+      '<span class="wp-arrow">→</span>' +
+    '</a>';
+  box.style.display = 'block';
+}
+
+/* CSV 解析（與 dashboard.html / world.html 同一套規則） */
+function peekParseCSV(text){
+  const lines = text.trim().split(/\r?\n/);
+  if(lines.length < 2) return [];
+  const headers = peekParseLine(lines[0]);
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const cells = peekParseLine(lines[i]);
+    if(cells.length < 2) continue;
+    const o = {};
+    headers.forEach((h,idx)=>{ o[h.trim()] = (cells[idx]||'').trim(); });
+    rows.push(o);
+  }
+  return rows;
+}
+function peekParseLine(line){
+  const out=[]; let cur='', inQ=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch === '"'){ if(inQ && line[i+1] === '"'){ cur+='"'; i++; } else inQ=!inQ; }
+    else if(ch === ',' && !inQ){ out.push(cur); cur=''; }
+    else cur+=ch;
+  }
+  out.push(cur);
+  return out;
+}
+
 function showResult(){
   showScreen('loading');
   setTimeout(()=>{
@@ -2612,6 +2762,8 @@ function showResult(){
       </a>
 
       ${renderBondsSection(code)}
+
+      ${renderWorldPeek(code)}
 
       <div class="share-section">
         <div class="s-label">SHARE · <span class="zh-only">分享你的街道靈魂</span><span class="en-only">分享你的街道靈魂</span><span class="ja-only">あなたの街の魂をシェア</span></div>
@@ -2776,6 +2928,7 @@ function showResult(){
       </div>
     `;
     showScreen('result');
+    loadWorldPeek(code);
     SFX.reveal();
     window.scrollTo({top:0,behavior:'smooth'});
   }, 1300);

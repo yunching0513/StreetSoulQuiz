@@ -184,6 +184,7 @@ body.iframe-mode .h-card-text{font-size:14px}
     <div class="head-right">
       VZT × TCAN<br>
       CURATION · <strong>YUN CHING WU</strong><br>
+      <a class="refresh-btn" href="world.html" style="text-decoration:none;color:inherit;margin-right:6px">🌍 WORLD MAP</a>
       <button class="refresh-btn" onclick="loadData()" id="refreshBtn"><span class="ico">↻</span> REFRESH</button>
     </div>
   </div>
@@ -223,7 +224,7 @@ body.iframe-mode .h-card-text{font-size:14px}
     <div class="emoji">⚠️</div>
     <div class="state-title">無法載入資料</div>
     <div class="state-msg">
-      請確認 <code>SHEET_CSV_URL</code> 已正確設定。<br>
+      請確認 <code>config.js</code> 的 <code>SHEET_CSV_URL</code> 已正確設定。<br>
       Apps Script 已部署並開放公開讀取。
     </div>
   </div>
@@ -292,17 +293,21 @@ body.iframe-mode .h-card-text{font-size:14px}
   </div>
 </div>
 
+<script src="config.js" onerror="window.SSQ_CONFIG=window.SSQ_CONFIG||{}"></script>
 <script>
 /* ============================================
-   CONFIG — 設定你的 Google Sheet CSV URL
+   CONFIG — Sheet CSV 網址現在統一放在 config.js
    ============================================
-   How to get this URL:
+   設定方式：編輯 config.js 的 SHEET_CSV_URL。
+   How to get that URL:
    1. Open your Google Sheet (with the quiz data)
    2. File → Share → Publish to web
    3. Select the sheet tab, format "Comma-separated values (.csv)"
-   4. Click Publish, copy the URL, paste below
+   4. Click Publish, copy the URL into config.js
+   下面的 fallback 只是為了相容舊版直接改這裡的做法。
    ============================================ */
-const SHEET_CSV_URL = 'PASTE_YOUR_PUBLISHED_CSV_URL_HERE';
+const SHEET_CSV_URL = (window.SSQ_CONFIG && window.SSQ_CONFIG.SHEET_CSV_URL)
+  || 'PASTE_YOUR_PUBLISHED_CSV_URL_HERE';
 
 /* Type metadata (must match quiz) */
 const TYPES = {
@@ -374,7 +379,7 @@ async function loadData(){
   document.getElementById('content').style.display = 'none';
 
   if(!SHEET_CSV_URL || SHEET_CSV_URL.includes('PASTE_YOUR')){
-    showError('尚未設定 Sheet CSV URL，請編輯 dashboard.html 中的 SHEET_CSV_URL');
+    showError('尚未設定 Sheet CSV URL，請編輯 <code>config.js</code> 中的 <code>SHEET_CSV_URL</code>');
     refreshBtn.classList.remove('spinning');
     return;
   }

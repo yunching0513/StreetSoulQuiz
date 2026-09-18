@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>世界街道靈魂地圖 · World Street Soul Map</title>
+<meta name="description" content="全世界的人，各自和街道有什麼樣的關係？一張持續長大的地圖 — Vision Zero Taiwan × TCAN">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="世界街道靈魂地圖 · World Street Soul Map">
+<meta property="og:description" content="街道長什麼樣子，就會長出什麼樣的人。看見全世界參與者的街道靈魂分布。">
+<meta property="og:image" content="og-image.png">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=DM+Serif+Display&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lime:#C8D400; --lime-dk:#A8B200; --lime-soft:#E8EE8C;
+  --coral:#FF6B5B;
+  --cream:#FBF7EC; --paper:#FFFCF2;
+  --black:#1A1A1A; --ink:#252525;
+  --g1:#4A4A4A; --g2:#8a8a8a; --g3:#D0D0D0; --g4:#F0F0EC;
+  --sea:#EFEADB; --land:#DCE0C2;
+  --white:#FFFFFF;
+  --zh:'Noto Sans TC',sans-serif;
+  --en:'Space Grotesk',sans-serif;
+  --serif:'DM Serif Display',serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{font-family:var(--zh);background:var(--cream);color:var(--black);min-height:100vh;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");pointer-events:none;opacity:.045;z-index:1;mix-blend-mode:multiply}
+.wrap{position:relative;z-index:2;max-width:1160px;margin:0 auto;padding:24px 24px 60px}
+
+/* language visibility */
+body.zh .en-only,body.zh .ja-only{display:none!important}
+body.en .zh-only,body.en .ja-only{display:none!important}
+body.ja .zh-only,body.ja .en-only{display:none!important}
+
+/* Header */
+.head{margin-bottom:26px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.back{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--black);font-size:13px;font-weight:700;border:1.5px solid var(--black);border-radius:100px;padding:7px 15px;background:var(--white);transition:.18s}
+.back:hover{background:var(--lime);transform:translateY(-2px)}
+.langs{display:flex;gap:6px}
+.lang-btn{font-family:var(--en);font-size:11px;font-weight:700;letter-spacing:.08em;border:1.5px solid var(--black);background:var(--white);color:var(--black);border-radius:100px;padding:7px 13px;cursor:pointer;transition:.18s}
+.lang-btn:hover{background:var(--lime-soft)}
+.lang-btn.on{background:var(--black);color:var(--lime)}
+.tag{display:inline-flex;align-items:center;gap:9px;background:var(--black);color:var(--lime);font-family:var(--en);font-size:10px;font-weight:700;letter-spacing:.22em;padding:7px 14px;border-radius:100px;margin-bottom:16px}
+.tag .dot{width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 6px var(--lime);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+h1{font-family:var(--serif);font-size:clamp(30px,5.4vw,52px);line-height:1.1;letter-spacing:-.01em;margin-bottom:12px}
+.sub{font-size:15px;line-height:1.75;color:var(--g1);max-width:660px}
+
+/* Banner */
+.banner{border:2px solid var(--black);border-radius:14px;padding:12px 16px;margin-bottom:20px;font-size:13px;line-height:1.6;background:var(--coral);color:var(--white);font-weight:700}
+.banner.soft{background:var(--lime-soft);color:var(--black);font-weight:400}
+.banner code{font-family:var(--mono);font-size:12px;background:rgba(0,0,0,.08);padding:1px 6px;border-radius:5px}
+.banner a{color:inherit}
+
+/* Stats */
+.stats-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:26px}
+.stat{background:var(--white);border:1.5px solid var(--black);border-radius:16px;padding:16px 18px}
+.stat-label{font-family:var(--en);font-size:9.5px;font-weight:700;letter-spacing:.18em;color:var(--g2);margin-bottom:8px}
+.stat-num{font-family:var(--en);font-size:34px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.stat-unit{font-family:var(--zh);font-size:13px;font-weight:400;color:var(--g2);margin-left:5px}
+.stat-meta{font-size:11.5px;color:var(--g2);margin-top:7px;line-height:1.5}
+.stat.live .stat-num{font-size:22px;font-family:var(--zh);font-weight:700}
+
+/* Cards */
+.card{background:var(--white);border:1.5px solid var(--black);border-radius:20px;padding:22px 22px 24px;margin-bottom:16px}
+.card-label{font-family:var(--en);font-size:9.5px;font-weight:700;letter-spacing:.2em;color:var(--g2);margin-bottom:9px}
+.card-title{font-family:var(--serif);font-size:clamp(20px,3vw,27px);line-height:1.28;margin-bottom:6px}
+.card-sub{font-size:13px;color:var(--g1);line-height:1.65;margin-bottom:18px}
+
+/* Map */
+.map-card{padding:22px 16px 18px}
+.map-box{position:relative;background:var(--sea);border:1.5px solid var(--black);border-radius:14px;overflow:hidden}
+.map-svg{display:block;width:100%;height:auto}
+.land{fill:var(--land);stroke:var(--black);stroke-width:.55;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.grat{stroke:var(--black);stroke-width:.35;opacity:.1;fill:none;vector-effect:non-scaling-stroke}
+.pin{cursor:pointer;outline:none}
+.pin circle.halo{fill:var(--coral);opacity:.16}
+.pin circle.core{fill:var(--coral);stroke:var(--black);stroke-width:1.4;vector-effect:non-scaling-stroke;transition:.16s}
+.pin:hover circle.core,.pin.on circle.core{fill:var(--lime);}
+.pin:focus-visible circle.core{fill:var(--lime);stroke-width:2.6}
+.pin text.pe{text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.pin text.pn{text-anchor:middle;font-family:var(--en);font-weight:700;fill:var(--black);pointer-events:none;paint-order:stroke;stroke:var(--sea);stroke-width:3.2;stroke-linejoin:round}
+.map-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;padding:0 6px}
+.legend{display:flex;align-items:center;gap:9px;font-size:11.5px;color:var(--g2)}
+.legend .lg{display:inline-block;border-radius:50%;background:var(--coral);border:1.4px solid var(--black)}
+.off-map{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--black);border-radius:100px;padding:5px 12px;font-size:12px;background:var(--paper);font-weight:500}
+.chip b{font-family:var(--en)}
+
+/* Detail panel */
+.detail{margin-top:14px;border:1.5px dashed var(--black);border-radius:14px;padding:16px 18px;background:var(--paper);min-height:86px}
+.detail-empty{font-size:13px;color:var(--g2);line-height:1.7}
+.d-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.d-name{font-size:19px;font-weight:700}
+.d-n{font-family:var(--en);font-size:13px;color:var(--g1)}
+.d-top{display:flex;align-items:center;gap:9px;font-size:14px;margin-bottom:14px;flex-wrap:wrap}
+.d-top .em{font-size:23px}
+.d-low{font-size:12px;color:var(--g2);font-style:italic}
+
+/* Axis bars */
+.axes{display:grid;gap:9px}
+.axis-row{display:grid;grid-template-columns:60px 1fr 60px;align-items:center;gap:9px;font-size:11.5px}
+.axis-row .l{text-align:right;color:var(--g1)}
+.axis-row .r{text-align:left;color:var(--g1)}
+.axis-bar{position:relative;height:16px;background:var(--g4);border:1.2px solid var(--black);border-radius:100px;overflow:hidden}
+.axis-fill{position:absolute;inset:0 auto 0 0;background:var(--lime);border-right:1.2px solid var(--black)}
+.axis-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--en);font-size:9.5px;font-weight:700;letter-spacing:.04em}
+
+/* Country grid */
+.c-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:12px}
+.c-card{border:1.5px solid var(--black);border-radius:15px;padding:14px 15px;background:var(--paper)}
+.c-card.thin{opacity:.62;background:var(--white)}
+.c-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:11px}
+.c-name{font-size:14.5px;font-weight:700}
+.c-n{font-family:var(--en);font-size:12px;color:var(--g1);white-space:nowrap}
+.c-dom{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.c-dom .em{font-size:22px}
+.c-dom .tx{font-size:12.5px;line-height:1.35}
+.c-dom .tx b{display:block;font-size:13px}
+.c-dom .tx span{color:var(--g2);font-size:11px}
+.c-thin-note{font-size:11.5px;color:var(--g2);line-height:1.55}
+
+/* Insight */
+.insight{background:var(--black);color:var(--paper);border-radius:20px;padding:26px 24px;margin-bottom:16px;position:relative;overflow:hidden}
+.insight::after{content:'';position:absolute;top:-45%;right:-20%;width:70%;height:180%;background:radial-gradient(ellipse,var(--lime) 0%,transparent 62%);opacity:.2;pointer-events:none}
+.insight .il{font-family:var(--en);font-size:9.5px;font-weight:700;letter-spacing:.2em;color:var(--lime);margin-bottom:12px;position:relative}
+.insight .iq{font-family:var(--serif);font-size:clamp(20px,3.2vw,29px);line-height:1.38;position:relative;margin-bottom:12px}
+.insight .ib{font-size:13px;line-height:1.75;color:#CFCFC6;position:relative;max-width:640px}
+.insight .ib b{color:var(--lime)}
+
+/* Ranked bars */
+.rank-list{display:grid;gap:7px}
+.rank-row{display:grid;grid-template-columns:1fr 92px;align-items:center;gap:12px}
+.rank-lab{display:flex;align-items:center;gap:8px;font-size:13px;min-width:0}
+.rank-lab .em{font-size:16px;flex-shrink:0}
+.rank-lab .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank-track{position:relative;height:9px;background:var(--g4);border-radius:100px;overflow:hidden;margin-top:5px}
+.rank-fill{position:absolute;inset:0 auto 0 0;background:var(--lime);border-radius:100px}
+.rank-num{font-family:var(--en);font-size:12px;text-align:right;color:var(--g1)}
+.rank-num b{color:var(--black)}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+
+/* States */
+.state{text-align:center;padding:56px 24px;border:1.5px dashed var(--black);border-radius:20px;background:var(--white);margin-bottom:16px}
+.state .emoji{font-size:44px;margin-bottom:14px}
+.state-title{font-size:19px;font-weight:700;margin-bottom:9px}
+.state-msg{font-size:13.5px;color:var(--g1);line-height:1.8;max-width:520px;margin:0 auto}
+.state-msg code{font-family:var(--mono);font-size:12px;background:var(--g4);padding:2px 7px;border-radius:5px}
+.state-msg a{color:var(--black)}
+.spin{display:inline-block;animation:sp 1.1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* CTA + footer */
+.cta{display:block;text-decoration:none;color:var(--black);background:var(--lime);border:2px solid var(--black);border-radius:20px;padding:24px;text-align:center;margin-bottom:16px;transition:.2s}
+.cta:hover{transform:translateY(-3px);box-shadow:6px 6px 0 var(--black)}
+.cta .ct{font-family:var(--serif);font-size:23px;margin-bottom:6px}
+.cta .cs{font-size:13px;color:var(--ink)}
+.privacy{border:1.5px solid var(--g3);border-radius:15px;padding:16px 18px;font-size:12.5px;line-height:1.8;color:var(--g1);background:var(--paper);margin-bottom:16px}
+.privacy b{color:var(--black)}
+.footer{text-align:center;padding:28px 0 0;font-size:11px;color:var(--g2);line-height:2;border-top:1.5px solid var(--g3)}
+.footer strong{color:var(--black)}
+.footer a{color:var(--g1)}
+
+/* 手機上把地圖改成可橫向捲動，維持標籤可讀 */
+.map-hint{display:none;font-size:11.5px;color:var(--g2);text-align:center;margin-top:8px}
+@media (max-width:640px){
+  .map-box{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .map-svg{min-width:680px}
+  .map-hint{display:block}
+  .wrap{padding:18px 15px 48px}
+  .card{padding:18px 16px 20px}
+  .map-card{padding:18px 10px 14px}
+  .axis-row{grid-template-columns:48px 1fr 48px;font-size:10.5px}
+  .rank-row{grid-template-columns:1fr 78px}
+}
+</style>
+</head>
+<body class="zh">
+<div class="wrap">
+
+  <div class="head">
+    <div class="topbar">
+      <a class="back" id="backLink" href="index.html">
+        <span>←</span>
+        <span class="zh-only">回到測驗</span><span class="en-only">Back to the quiz</span><span class="ja-only">診断にもどる</span>
+      </a>
+      <div class="langs">
+        <button class="lang-btn" data-lang="zh">中文</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="ja">日本語</button>
+      </div>
+    </div>
+
+    <div class="tag"><span class="dot"></span>WORLD MAP · <span class="zh-only">世界街道靈魂地圖</span><span class="en-only">WORLD STREET SOUL MAP</span><span class="ja-only">世界ストリートソウルマップ</span></div>
+    <h1 class="zh-only">街道長什麼樣子，<br>就會長出什麼樣的人</h1>
+    <h1 class="en-only">Streets shape us.<br>Here's the proof, one soul at a time</h1>
+    <h1 class="ja-only">街のかたちが、<br>そこに生きる人をつくる</h1>
+    <p class="sub zh-only">每一個做完測驗的人，都在這張地圖上留下一個點。這不是排行榜，是一張還在長大的世界切片 — 看看在別的城市，人和街道是什麼樣的關係。</p>
+    <p class="sub en-only">Everyone who finishes the quiz adds a dot to this map. Not a leaderboard — a slice of the world that keeps growing. See how people relate to streets somewhere else.</p>
+    <p class="sub ja-only">診断を終えた人が、この地図にひとつずつ点を残していきます。ランキングではなく、育ちつづける世界の断面です。ほかの街では、人と道はどんな関係なのでしょう。</p>
+  </div>
+
+  <div id="banner"></div>
+
+  <div class="stats-strip">
+    <div class="stat">
+      <div class="stat-label">TOTAL · <span class="zh-only">累計街道靈魂</span><span class="en-only">SOULS SO FAR</span><span class="ja-only">これまでの参加</span></div>
+      <div class="stat-num" id="sTotal">—</div>
+      <div class="stat-meta" id="sTotalMeta">&nbsp;</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">PLACES · <span class="zh-only">國家／地區</span><span class="en-only">COUNTRIES</span><span class="ja-only">国・地域</span></div>
+      <div class="stat-num" id="sPlaces">—</div>
+      <div class="stat-meta" id="sPlacesMeta">&nbsp;</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">TODAY · <span class="zh-only">今日加入</span><span class="en-only">JOINED TODAY</span><span class="ja-only">今日の参加</span></div>
+      <div class="stat-num" id="sToday">—</div>
+      <div class="stat-meta" id="sTodayMeta">&nbsp;</div>
+    </div>
+    <div class="stat live">
+      <div class="stat-label">LATEST · <span class="zh-only">最新加入</span><span class="en-only">MOST RECENT</span><span class="ja-only">最新の参加</span></div>
+      <div class="stat-num" id="sLatest">—</div>
+      <div class="stat-meta" id="sLatestMeta">&nbsp;</div>
+    </div>
+  </div>
+
+  <div id="loading" class="state">
+    <div class="emoji spin">🌍</div>
+    <div class="state-title zh-only">正在讀取世界…</div>
+    <div class="state-title en-only">Loading the world…</div>
+    <div class="state-title ja-only">世界を読み込み中…</div>
+  </div>
+
+  <div id="setup" class="state" style="display:none">
+    <div class="emoji">🔧</div>
+    <div class="state-title zh-only">還沒接上資料來源</div>
+    <div class="state-title en-only">Data source not connected yet</div>
+    <div class="state-title ja-only">データソースが未設定です</div>
+    <div class="state-msg" id="setupMsg"></div>
+  </div>
+
+  <div id="failed" class="state" style="display:none">
+    <div class="emoji">⚠️</div>
+    <div class="state-title zh-only">資料讀取失敗</div>
+    <div class="state-title en-only">Could not load the data</div>
+    <div class="state-title ja-only">データを読み込めませんでした</div>
+    <div class="state-msg" id="failedMsg"></div>
+  </div>
+
+  <div id="empty" class="state" style="display:none">
+    <div class="emoji">🌱</div>
+    <div class="state-title zh-only">地圖還是空的</div>
+    <div class="state-title en-only">The map is still empty</div>
+    <div class="state-title ja-only">地図はまだ空っぽです</div>
+    <div class="state-msg zh-only">第一個做完測驗的人出現後，這裡就會長出第一個點。</div>
+    <div class="state-msg en-only">The first dot appears as soon as someone finishes the quiz.</div>
+    <div class="state-msg ja-only">最初のひとりが診断を終えたら、最初の点があらわれます。</div>
+  </div>
+
+  <div id="content" style="display:none">
+
+    <!-- MAP -->
+    <div class="card map-card">
+      <div class="card-label">THE MAP · <span class="zh-only">世界分布</span><span class="en-only">WHERE WE ARE</span><span class="ja-only">世界の分布</span></div>
+      <h2 class="card-title zh-only">大家從哪裡來？</h2>
+      <h2 class="card-title en-only">Where is everyone?</h2>
+      <h2 class="card-title ja-only">みんな、どこから？</h2>
+      <p class="card-sub zh-only">圓點大小代表人數，點一下看那個國家／地區的樣貌。</p>
+      <p class="card-sub en-only">Dot size is the number of people. Tap one to see that country's profile.</p>
+      <p class="card-sub ja-only">円の大きさは人数です。タップするとその国・地域の傾向が見られます。</p>
+
+      <div class="map-box">
+        <svg class="map-svg" id="map" viewBox="0 18 1000 392" role="img" aria-labelledby="mapTitle">
+          <title id="mapTitle">World distribution of Street Soul quiz participants</title>
+          <defs>
+            <path id="landPath" d="M334.5 472.3L332.9 475L320.9 474.8L315.9 472.9L328.1 473.3L331.6 471.2L334.5 472.3ZM57.8 470.8L52.4 471.2L45.2 468.3L46.9 467.3L52.1 467.7L57 469.6L57.8 470.8ZM374.6 466.8L378 468L379.6 472.3L359.8 475.1L349.5 474L350 472.8L358.4 471.1L364.8 466.8L370.4 466.2L374.6 466.8ZM163.3 454.2L170.2 454.1L166 455.8L159.4 454.6L160 453.7L163.3 454.2ZM151.2 454.1L155.5 455.2L146.4 454.1L148.5 453.5L151.2 454.1ZM225.1 449.8L231.1 449.9L232.8 451.4L220 451.4L215.8 449.7L225.1 449.8ZM309.9 447.1L310.2 448.4L308.9 450.5L302.6 451.4L298.9 451.3L300.3 450.3L293.9 451L291.8 450.2L291.6 449.1L296.6 447.6L299.8 447.8L300.7 443.1L302.3 441.8L304.9 441.3L309.9 447.1ZM0 485.3L2.6 483.7L7.6 484.6L11.3 483.6L15.6 484.8L19.8 483.5L27.9 483L36.1 484.9L60.9 487.1L68.9 486.4L87.4 487.8L102.5 486.2L103.1 484.9L83.2 484.2L80.8 483.1L73.4 482.5L75.9 479L75.4 477.9L64.3 475.3L77.5 475L81.5 475.9L93.3 473.2L92.3 472L84.6 470.4L68.5 469.6L61 466.7L60.1 463.6L64 464.7L72.9 464.1L75.2 465.3L79.6 465L94.2 462.4L93.1 460.4L93.9 459.4L97.5 458.9L99.1 459.8L124.4 456.4L167.5 456.9L173.7 455.6L177.2 456.2L183.5 454.8L188.1 457.5L190.9 456.7L201.2 458.8L208.7 458.2L220.4 459.2L221.9 458L218.7 456.1L215.2 455.9L213.6 454.8L212 451.7L224.6 452.5L228.6 454.3L232.4 454.5L243.2 453.2L249.8 453.7L252.1 451.6L254.4 452.8L261.1 453L263.4 454.1L273.7 455.1L277 453.1L288.3 455.5L308.5 452.8L311.2 452.2L313.5 450.1L309.6 443.7L312.3 440.4L312.7 439.3L311.8 437L313.2 435.8L325 429.6L339.4 425.8L341 426.5L336 428.8L331.6 428.6L327.7 430L326 431.9L327.4 433.9L322.9 434.7L318 437.7L317.6 438.8L320 440.8L324.5 442.3L328.3 446.4L331.4 453.2L331 454.7L327.9 456.8L324.2 457.2L321.2 459.1L306.1 461.7L303.9 462.9L285.4 463.1L286.3 464.2L295.4 466.4L283.5 467.7L283.3 470L290.7 472.9L334.2 478.8L338.3 481.2L361.8 477L381.1 478L386.7 476L420.7 473.2L417.5 471.2L417.5 470.2L401 470.7L400.2 469.7L400.6 467.6L419.8 463L437.6 461.4L451.3 458.7L456.4 456.9L457.2 455.9L454.3 455.2L457.1 453.2L465.9 451.1L471.4 448L479.4 449.2L480.9 447L487.9 448.5L498.2 447.8L499.4 449L517.4 445.7L521.5 444.1L523.6 444.9L526.5 444.5L530 446.8L537.3 444.4L540.9 444.5L542 445.6L544.3 444.5L553.5 444.1L559.6 444.6L562.7 446.4L575.3 445.7L588.9 443.5L594.1 440.3L600.4 442.4L603.3 442.1L607.4 443.8L616.6 440.6L629.2 437.8L631.8 438.1L636.1 436.4L641 435.8L641.5 434.8L643.9 434L651.5 432.8L656.5 433.3L663.2 436.9L670.6 438.8L673.3 438.9L677.9 437.2L691.4 438.7L693.5 442.3L693.2 443.6L688.4 445.3L688.7 446.4L691.8 446.3L688.7 449.6L694.1 450.7L697.3 450.2L705.2 444.1L715.7 443L719.8 439.8L729.9 436.7L741 436.5L743 435.8L744.4 433.9L746.7 436L749.1 436.5L761.6 436.4L766.1 437.2L777 436.8L785.6 432.1L794.9 435.9L806.2 435.3L815.6 433L821.1 435.3L832.9 436.9L842.3 434.7L857.8 435.4L874.3 433.9L875.2 431.4L876.9 432.2L879.5 435.5L881.8 436L904.1 435.9L906.1 436.7L905.6 437.8L907.3 438.6L913.4 440L923.6 441.3L926.8 441.4L928.6 440.4L935.6 442.7L942.2 443.3L948.8 446.1L964.7 446.8L975.6 449.2L970.2 454.6L961.4 456.6L956.2 459.6L954.4 461.8L954.1 464.1L957.6 467.2L962.8 467.6L963.9 468.8L949.3 469.9L943.9 474.9L954.7 478.9L969.1 481.5L970.6 482.8L978.6 483.4L981.2 484.5L988.8 483.8L1000 485.3ZM311.8 399.6L319.3 401.9L318.1 403.3L315.4 403.5L314 402.5L310.7 404.5L307.7 404.2L299.3 401.4L292.6 396.8L302.5 400.2L304.8 397L307.4 395.9L309.4 396.2L311.8 399.6ZM337.4 391.9L339.6 393.2L338.8 394.2L335 395L333.8 394L331.4 395.3L330 394L333.3 392.4L335.7 393.1L337.4 391.9ZM695.2 388.1L691 388.3L691.5 385.1L695.9 386.3L695.2 388.1ZM903.9 363.3L906.6 364.3L911.9 363.5L912.1 366.8L910.9 370L909.9 369.3L908 371.2L905.7 371L902 364.3L902.1 363.1L903.9 363.3ZM980.6 363.7L981.2 364.8L983.2 363.7L984 364.9L984 366L979.7 370.5L980.8 371.8L976.3 372.9L973.9 377.5L970.4 379.6L963 378.4L962.5 377.4L964 375.3L967.5 372.6L973.7 369.5L977.6 365.3L978 363.8L980 362.5L980.6 363.7ZM985 350.4L987 353.4L987.1 351.5L988.4 352.2L988.8 354.3L991 355.2L995.9 354.7L994.4 358.8L992.2 358.7L991.8 360.8L988.9 364.7L986.8 365.8L985.1 364.7L986.7 362.4L985.8 360.9L982.8 359.7L982.9 358.7L984.9 357.8L985.3 353.8L979.5 345.9L980.6 345.7L984.2 348L985 350.4ZM964.2 311.6L963.2 312.2L959.6 310.2L955.6 305.8L958.4 306.8L964.2 311.6ZM995.5 298.2L996.4 299L996 300.4L992.7 300.5L992.5 299.2L993.5 298.3L995.5 298.2ZM0 296L-3.5 297.3L-3.9 296.2L0.6 294.5L0 296ZM966.2 295.7L965.3 296.1L964.5 294.1L966.2 295.7ZM964.2 291.5L964.6 293.7L963.3 293.5L962.9 290.6L964.2 291.5ZM639 287.7L639.9 293.6L639.4 294.4L638.5 292.8L638 293.6L638.3 296.9L630.8 319.3L626.1 321.1L622.3 319.4L620.1 311.3L620.6 309.3L621.9 308.8L623.3 305.8L622.1 298.4L623.5 295L628.6 293.8L632.5 290.5L633.3 289.1L633 288L634.1 288.3L636.7 283.4L639 287.7ZM898.8 288.2L899.8 290.4L901.6 289.4L903.8 291.6L904.1 295.2L906.6 302.7L913.5 306.6L913.1 307.3L915.8 312.1L916.9 311.5L918 312.7L918.7 312.2L919.2 315.2L924.6 320.2L925.4 322.4L925.3 325.7L926.6 328.1L925.2 335.9L923.5 340.4L921.4 341.8L917.6 349.1L916.7 354L915.1 354.9L912 355L906.4 358.4L902.4 356.7L902.9 355.3L898.9 357.8L890.7 355.6L888.9 353.9L887.7 350.4L886.3 349.3L883.7 348.9L884.6 347.6L883.9 345.5L882.5 347.4L880.1 347.9L883 343.4L882.8 341.4L878.8 344.7L877.7 346.9L875.6 345.8L875.7 344.3L872.5 341.2L873 340.6L864.8 337.5L850.4 339.5L845.1 341.6L843.5 344.1L833 344.4L827.8 347.4L824 347.3L819.5 345L819.6 343.4L821.4 342.4L821.4 337.8L819.9 335L819.6 331.8L814.8 322.5L816 323.7L815.1 321.2L817.3 323.1L815 317.7L817.1 310.4L817.3 312.5L818.5 310.6L824.2 307.5L826.2 307.6L831.3 305.4L835.7 304.7L839.6 300.5L839.8 297.9L841.7 295.6L842.9 298L844.1 297.4L843.1 296.1L843.9 294.8L845.2 295.4L845.5 293.2L849.1 289.5L850.3 289.9L850.4 289.2L853 288.4L856.6 291.3L860.1 291.6L859.5 290.1L862.1 287.1L861.6 286.4L862.8 284.8L864.5 283.8L868.3 283.7L868.2 282.2L866.2 281.3L867.7 280.9L875.8 284L879.1 282.9L880.4 284.3L878.6 286.9L877.7 287L878 288.1L876.4 291.7L889.5 299.2L891.3 298.2L892.4 295.5L893.6 291.8L893.6 284.5L895.9 279.6L898.7 285.7L898.8 288.2ZM950.3 279.1L951.1 280.1L949.2 280.1L948.1 278.3L950.3 279.1ZM835.3 278.4L830.5 276.5L833.1 276L835.5 277.7L835.3 278.4ZM946.8 277.4L944 277.2L943.6 275.7L946.8 277.4ZM949.1 276.7L948.7 277.2L946.1 273.1L947 273.1L949.1 276.7ZM845.7 278.2L842.9 278.4L844.4 275.8L847.5 274L853.7 273.3L847.5 276.1L845.7 278.2ZM827.5 272.5L830.2 273L830.9 274.2L824.3 275.1L825.2 273.5L826.8 273.5L827.5 272.5ZM841.4 272.5L841 274L836.8 274.8L833.1 274.5L833.1 273.5L835.3 272.9L837.1 273.7L841.4 272.5ZM944.1 273.2L944.2 273.7L939.5 270.6L944.1 273.2ZM937.6 270.4L935.8 269.9L934.8 268.3L937.6 270.4ZM801.7 268.8L807.1 269.1L807.7 268L812.8 269.3L813.8 271.1L818 271.6L821.4 273.3L818.2 274.3L815.2 273.2L800.8 271.6L795.7 270.4L795.2 269.2L792.7 269L794.6 266.4L798 266.5L801.3 267.8L801.7 268.8ZM874.2 267.3L872.8 269.2L872.5 267.1L873.6 265.1L874.2 267.3ZM933 268.9L931 268.2L929.2 264.3L933.4 268.2L933 268.9ZM922.2 265.2L917.3 267.5L912 266L912.2 265.1L916.2 265.3L917.1 263.9L917.3 265.4L918.9 265.2L921.2 263.2L920.9 261.6L923.2 262L922.2 265.2ZM853.5 259.6L852.4 260.5L850.5 260L850 258.8L852.8 258.7L853.5 259.6ZM862.4 258.6L863.4 260.7L861.1 259.6L855.3 259.4L855.9 257.9L862.4 258.6ZM925.4 262.5L924.5 263.2L923.3 260.5L918.5 257.6L919.3 256.9L922.9 259L925.1 261.1L925.4 262.5ZM872.6 253.2L873.4 257.7L876.3 259.4L878.6 256.4L881.8 254.7L884.2 254.7L901.6 260.7L905.1 263.5L905.5 265.2L910.1 266.9L910.8 268.4L908.2 268.7L908.9 270.5L911.3 272.3L913.1 275.3L914.7 275.2L914.6 276.4L916.8 276.9L915.9 277.4L918.9 278.6L918.6 279.4L910.9 278.1L907.1 274.8L905.7 272.4L902.1 271.2L898 272.9L898.4 275L896.2 275.9L891.8 275.3L889.3 273L886.5 272.5L885.8 273.3L882.3 273.4L883.4 271.1L885.2 270.3L883.1 265L875.5 262.4L871.3 259.8L869.4 261.4L868.8 259.2L866.6 257.8L871.6 256.9L871.4 256.2L867.3 256.1L866.2 254.5L863.7 254L862.6 252.6L867.7 251L872.2 252.2L872.6 253.2ZM847.9 246.1L845.7 248.8L843.6 249.3L833.8 249.3L833.4 251.4L835.9 253.9L837.4 252.7L842.6 251.7L842.4 253L841.2 252.6L840 254.2L837.5 255.3L840.1 258.9L839.6 259.8L842.1 263L842.1 264.8L840.6 265.6L839.5 264.7L840.9 262.4L838.2 263.5L837.5 262.7L837.8 261.6L835.8 260L836 257.3L834.2 258.1L834.5 265.4L832.8 265.8L831.6 264.9L832.4 262.4L831.9 259.7L830.8 259.7L829.9 257.8L833.4 248.4L835.8 246.4L841.5 247.6L844.7 247.5L847.4 245.4L847.9 246.1ZM857.5 246.9L857.3 249.3L855.9 249L855.5 250.7L856.6 252.2L855.8 252.5L853.9 247.2L855.4 244L855.6 245.5L857.2 245.7L857.5 246.9ZM793.9 266.3L790.9 266.3L785 261.7L778.2 251.8L775.7 249.5L773.9 244.9L764.9 236.2L764.7 234.8L770.8 235.4L779.6 244.2L782.4 244.2L788.4 249.7L787.3 252L789.9 253L791.4 256.5L793.4 256.7L794.7 258.5L793.9 266.3ZM827.4 244.9L830.5 247.5L827.3 247.8L826.3 249.7L826.4 252.2L823.8 254.1L822.6 261.1L822.2 260.2L819.1 261.4L818 259.7L814.6 258.7L811.3 259.7L810.3 258.3L806.2 258.2L805.7 254.4L803 251.3L803 246.3L804.6 244.4L806.7 245.4L808.8 244.9L809.4 242.5L813.9 241.4L824.2 230.8L825.4 230.8L826.9 233.4L831.1 235L830.9 236.1L829 236.2L829.5 237.6L827.4 238.5L825.9 241L827.9 243.6L827.4 244.9ZM851 226.6L851.5 230L850.5 232.6L849.5 229.7L848.2 231.1L849.1 233.2L848.3 234.5L845.1 232.9L844.3 230.9L845.1 229.6L843.4 228.2L839.1 230.8L838.7 230L839.8 227.7L843 225.9L844 227.1L846.1 226.3L846.6 225.1L848.5 225L848.4 222.9L850.6 224.2L851 226.6ZM725.6 232.8L723.2 233.4L721.9 231.2L721.4 227.2L722.6 222.7L724.6 224.3L727.2 229.1L726.8 232L725.6 232.8ZM330.7 221.9L327.9 222L328.7 220.1L330.3 219.7L330.7 221.9ZM844.4 221.4L841.7 224.9L839.9 223L841.5 219.8L843 219.6L842.6 221.5L844.7 218.8L844.4 221.4ZM829.2 224.1L825.5 226.8L832 218.4L832.5 220.7L829.2 224.1ZM838.6 217L842 217.8L841.9 219L838.9 221L838.6 217ZM848.6 216.2L849.4 219.3L847.3 218.6L848 221.2L846.7 221.9L846.6 219.9L845.7 219.7L845.3 218.1L846.9 218.3L846.9 217.2L845.2 215.1L847.8 215.2L848.6 216.2ZM837.6 213.7L836.8 216.1L834.2 212.6L836.6 212.7L837.6 213.7ZM837 198.6L838.7 199.4L839.6 198.7L839.4 200.5L840.3 202.5L839.6 204.8L837.9 205.7L838.1 210.2L840.8 210.2L844.3 211.7L844.7 215.2L841.5 212.4L840.8 213.4L839 211.7L835.1 211.5L836.1 209.6L835.3 209L834.9 210L833.5 208.4L833 204.5L834.1 205.5L835.3 198.6L837 198.6ZM317.8 199.4L317.1 200.1L313.4 200.1L313.2 199L315.9 198.6L317.8 199.4ZM286.4 200.4L285.5 200.8L282.4 199.4L283.9 198.5L286.4 198.9L288.3 200.3L286.4 200.4ZM298.4 194.8L305.7 195.4L306.2 196.4L307.7 196.4L307.6 197.2L310.2 198.3L309.2 199.4L305.7 198.8L304.1 199.5L303.7 198.8L301.7 201.1L300.8 199.9L299 199.4L294.7 199.9L293.2 199L293.4 198.2L298.1 198.8L299.1 198.1L297.8 195.9L296.1 195.4L296.7 194.7L298.4 194.8ZM806.5 198.1L804.1 199.5L801.8 198.6L801.7 196.2L803.1 194.9L807.7 194.2L808.4 195.3L806.5 198.1ZM67.9 197L66.8 197.1L67.1 193.7L70 195.8L67.9 197ZM66.5 192.7L65.5 192.9L64.7 191.9L66.5 192.7ZM278.7 186.8L279.8 187.8L282.4 187.5L287.4 191.1L290 191.6L289.8 192.4L294 193.7L291.8 194.7L284 194.8L285.9 193.3L283 192.4L281.3 190L271.8 187.8L272.8 187.1L270.1 187L266.5 189.1L264 189.2L267.3 186.7L271.5 185.6L278.7 186.8ZM284.6 184L283.9 184.1L282.2 181.7L282.8 180L283.6 180.1L284.6 184ZM836.6 186.7L835.4 189L833.6 184.6L837.5 179.7L838.8 180.6L836.6 186.7ZM283.8 176.2L280.8 176.6L280.6 175.6L283.8 175.4L283.8 176.2ZM286.1 176.1L285.6 178.1L283.9 174.9L286.1 176.1ZM874 155.1L874.3 156.1L872.8 157.8L871.6 156.9L870.2 157.5L869.5 159.2L867.7 158.4L867.7 157L869.2 155.4L870.8 155.7L872 154.5L874 155.1ZM596 150.9L594.2 152.1L594.5 152.8L591.6 154L589.6 152.5L596 150.9ZM565.8 150.8L567.4 151.8L573 151.9L572.7 152.8L568.7 153L565.3 152L565.8 150.8ZM543.1 143.8L541.9 148.3L534.5 145.5L534.9 144.1L543.1 143.8ZM525.6 135.5L527.2 137.5L526.9 141.2L524.5 141.9L523.4 141.2L522.7 136.2L525.6 135.5ZM891.6 146.8L890.6 149L891 150.4L889.6 152.4L886 153.7L881.2 153.9L877.2 157L875.3 156L875.2 153.9L863.8 155.9L866.7 157.9L864.8 162.6L863 163.8L861.7 162.7L862.4 160.2L860.6 159.4L859.5 157.5L862.1 156.7L868.4 151.6L873.9 150.7L876.9 151.3L879.8 146.4L881.6 147.7L887.3 143.8L889 140.4L888.6 137.3L889.7 135.6L892.7 135.1L894.2 138.9L894.1 141.2L891.6 144L891.6 146.8ZM526.6 132.9L525.6 135.1L524.4 134.5L523.7 132.6L526.1 130.5L526.6 132.9ZM899.7 127.3L901.7 127.9L903.7 126.7L904.3 129.8L900.2 130.6L897.7 133.3L893.4 131.4L891.8 134.5L888.8 134.5L888.4 131.8L889.8 129.6L892.7 129.5L894.4 123.5L899.7 127.3ZM323.2 120.7L327.7 121L325.4 122.3L321.1 120.2L322.2 119.3L323.2 120.7ZM328.3 113.6L323.4 112.8L320.8 111.5L325.4 111.9L328.3 113.6ZM156.9 115.3L155.5 115.6L151 114.4L147.1 111.6L144.3 111.1L143.5 109L150.7 110.3L156.9 115.3ZM344.1 109.2L342.2 111.6L344 110.7L345.9 111.3L344.9 112.3L351.5 113.2L350.6 115.2L352.5 114.8L353.8 118L352.6 120.4L349.5 120L350.1 117.7L349.3 117.4L346.1 119.8L344.5 119.7L346.4 118.4L343.7 117.7L335.4 117.8L334.9 116.9L336.7 116L335.5 115.2L337.8 113.5L340.7 109.1L342.4 107.5L346.1 106.7L344.1 109.2ZM131.4 99.9L134 99.7L133.2 102.8L135.6 105.1L134.5 105L130.4 101.6L130.1 99.5L131.4 99.9ZM899 109L901.8 114L897.7 113L896 117.1L898.7 119.9L898.6 121.8L896.5 120.2L894.7 122.3L894.2 114.3L894.9 108.5L893.3 105.7L893.6 101.9L896.1 100.7L895 99.4L896.3 99L899 109ZM481.1 104.8L476.2 106.5L472.3 106.1L474.5 103.2L473.1 100.3L479 96.9L481.3 96.7L484.3 98.5L482.8 100.4L483.2 102.4L481.1 104.8ZM535.2 95.5L533.6 97.8L530.7 96.2L530.3 95.1L534.4 94.1L535.2 95.5ZM75 91.3L72.2 92.4L70.8 91.7L70.4 90.4L74.4 89L77.4 90L75 91.3ZM491.7 87.1L488.7 90.1L494.6 89.8L493.8 92L491.3 94.5L494.2 94.7L496.9 98.3L498.8 98.7L501.3 103L504.7 103.5L504.3 105.3L502.9 106.1L504 107.5L501.5 109L493.1 109.7L491.8 109.2L490 110.5L487.4 110.2L485.4 111.2L484 110.7L488 107.7L490.5 107.2L486.2 106.7L485.4 105.6L488.3 104.7L486.8 103.2L487.3 101.4L491.4 101.7L491.8 100L489.9 98.3L486.5 97.8L485.9 97.1L486.9 95.8L486 95L484.5 96.4L484.3 93.7L482.9 92.3L483.9 89.4L486.1 87.1L491.7 87.1ZM40.1 83.6L38.4 84L34.9 82.7L39.8 82.5L40.1 83.6ZM279.8 77.3L278.7 78.8L276.8 77.7L278 76.7L279.8 77.3ZM272.5 75.8L269.3 77.3L266.7 76.5L268.8 75.2L272.5 75.8ZM23 72.8L31.4 74.2L29.1 75.1L25.9 74L23.5 74.1L23 72.8ZM263.4 67.6L264 68.8L265.4 68.4L273.2 71L273.5 72.3L275.5 72.1L277.5 73L275 73.9L270.7 73.2L269.1 71.9L262.4 74.9L261.5 73.2L257.7 73.5L260.1 72.1L261.4 67.4L263.4 67.6ZM459.7 65.4L459.1 67.2L462.2 69.1L458.6 71.2L448.2 73.6L436.8 72.3L439.5 71.1L433.5 69.7L438.4 69.2L438.3 68.4L432.4 67.7L434.3 65.9L438.5 65.5L442.8 67.4L447.1 65.9L450.6 66.7L455.1 65.2L459.7 65.4ZM289.3 63.5L286.1 63.6L285.5 62.3L286.6 60.7L289.2 60.3L291.4 61.1L291.1 62.7L289.3 63.5ZM0 58.4L14.1 63.3L13.9 65L15.7 65.7L15.1 63.7L22.6 64.1L28.1 66.7L25.3 67.9L20.8 68.2L20.7 70.9L19.6 71.5L11.2 69.7L10.5 68.5L4.6 68.4L3.1 67.4L3.7 66.4L0.3 67L1.6 68.3L0 69.5L-3.6 70.7L-7.2 70.5L-1.8 75L-2.1 76.9L-7.3 76.3L-17.6 78.7L-25.8 82.4L-26.9 83.7L-30.8 81.7L-38.1 83.9L-39.3 82.9L-42 84.1L-45.7 83.7L-46.6 85.5L-50 88.2L-49.9 89.3L-46.7 90L-47.1 94L-49.6 94.1L-50.8 96.4L-49.7 97.6L-54.5 99L-55.5 102.2L-59.6 102.9L-60.5 105.7L-64.5 108.3L-68.2 96.2L-66.9 92.3L-64.6 90.7L-64.4 89.4L-60.1 88.7L-50.4 82.4L-45.4 80.2L-43.1 76.2L-46.5 76.5L-48.2 78.8L-55.2 81.8L-57.5 78.4L-64.7 79.4L-71.6 84L-69.3 85.7L-79.8 86.7L-79.6 84.7L-83.9 84.3L-87.4 85.7L-95.9 85.2L-105 86L-124.7 98L-120.3 98.3L-118.9 100.1L-116.2 100.7L-114.4 99.3L-111.4 99.5L-107.4 102.5L-107.3 104.9L-109.5 107.7L-110.9 115.4L-116.1 121.4L-125.4 129.5L-129.1 131.1L-130.8 131.1L-132.6 129.8L-139 133.5L-139.8 134.4L-139.7 136.4L-145.7 139.6L-146.2 141.1L-143.5 142.7L-140.4 147.8L-140.4 151L-141.4 152.5L-148.7 154.5L-148.4 150.9L-149.7 148L-147.6 147.5L-149.5 145.1L-150.9 144.6L-152 145.4L-153.6 144.1L-152.2 142.6L-151.9 140.1L-154.8 139.1L-163.7 142L-162.3 140.7L-162.8 139.6L-160.6 137.7L-162.1 136.3L-167.7 139.2L-169.4 141L-172.1 141.1L-173.5 142.4L-172.1 144.3L-169.8 144.7L-169.7 146L-167.5 146.8L-164.4 144.8L-160.1 146L-159.7 147.4L-163.6 148.2L-169 153L-166 154.6L-161.4 162L-161.4 164L-163.2 164.8L-162.5 166.3L-160.9 167.1L-162 171.6L-163.5 171.8L-170.4 181.8L-178.1 186.7L-181.2 187L-182.9 188.3L-183.9 187.4L-185.4 188.7L-192.3 190.6L-193.2 193.5L-194.8 193.7L-195.5 191.6L-194.8 190.6L-198.6 189.7L-203.6 192.5L-205.9 195.1L-206.5 197.1L-201.8 203.6L-197.6 207.6L-196.3 212.7L-196.7 217.6L-207.9 226.1L-208.9 224.3L-208.1 222.4L-210.2 220.9L-212.5 220.5L-215 216.1L-217.5 214.9L-219.9 214.9L-219.5 212.7L-222 212.8L-222.2 215.8L-224.6 222.3L-224.4 224.3L-222.6 224.4L-220.9 229.4L-214 234.7L-212.8 236.5L-212.5 242.2L-210.5 246.4L-212.4 246.6L-218.4 242.3L-221.7 235.2L-222 232L-226.4 226.7L-226.8 228.3L-227.4 226.8L-225.7 218.2L-226.6 216.6L-226.4 213.5L-227.5 212.1L-230.1 203L-235.1 206.3L-238.4 205.5L-237.4 202L-238 199.4L-240.2 196.2L-239.8 195.2L-241.5 194.8L-243.4 192.6L-246.1 186.8L-248.6 186.7L-249.2 189.3L-252.7 188.7L-253.1 189.7L-258.4 190.3L-258.2 192.4L-259.7 194L-263.7 195.9L-271.7 202.7L-271.7 204L-276.9 205.8L-277.7 208L-277 213.9L-278.2 216.5L-278.2 221.2L-279.6 221.4L-280.9 223.5L-280 224.4L-282.6 225.2L-284.6 227.9L-287.2 225.3L-289.6 218.6L-292 214.6L-293.2 209.4L-295.7 205.6L-298.3 190.7L-302.3 192.3L-304.3 192L-307.9 188.6L-306.5 187.6L-307.4 186.5L-312.7 183.5L-315.6 179.4L-329.2 180.3L-340.6 178.5L-341.7 175.1L-343.1 174.6L-348 176.4L-356.9 172.6L-360.8 166.3L-362.3 166.7L-364.1 165.8L-365.1 166.9L-366.7 166.7L-364.4 173.1L-360.7 175.9L-360.8 177.9L-358.9 181.2L-358.3 177.8L-356.7 178.3L-357.3 181.6L-356.1 183.3L-350 183L-343.4 176.7L-343.3 180.8L-342.1 182.7L-336.9 184.5L-333.9 188L-337.5 193.3L-339.4 193.8L-339.7 197.4L-342.8 198.4L-343.7 200.3L-346.5 201L-346.5 202.1L-354.5 204.5L-355.1 206.7L-362.3 209.1L-364.8 211.1L-373.3 213.1L-375 214.7L-379.2 214.9L-381.7 207.7L-381.1 207.6L-381.5 203.4L-386.3 195.9L-389.4 193.5L-391.3 190.9L-391.5 187.3L-393.1 184.2L-395.9 182.5L-397.4 178.9L-402.4 172L-403.8 172.1L-403 168.1L-405.8 173.2L-408 171.1L-409.9 167.1L-405.3 177.4L-400.9 183.5L-401.3 185.8L-397.6 188.9L-395.9 198.3L-393.3 200L-390.9 205.8L-379.7 215.6L-379.8 216.7L-381.3 217.4L-377.5 221L-376.1 221L-358 216.6L-358.2 220.4L-362.6 231.1L-367.4 238.3L-370.7 242.1L-380.2 249.2L-384.5 254.7L-388.2 257.1L-390 262.1L-391.1 263L-392.4 266.4L-392.2 268L-390.4 269L-391.1 273.6L-387.6 279.9L-386.7 290.8L-388.6 294.7L-390.4 296.4L-396.1 298.9L-403.4 305L-403.6 306.9L-401.2 311.4L-401.5 317L-409.5 321.5L-408.6 322.8L-409.8 328.6L-416.5 336.5L-421.6 341L-428.4 344.3L-437.3 344.1L-445.5 346.7L-449 344.8L-450.2 340.6L-449.3 340.1L-449.4 338L-457.7 325.3L-460.4 311.4L-467.2 300.2L-467.7 296.3L-465.3 287.6L-462.1 283.4L-462 279.8L-464.2 275.5L-463.2 273.8L-466.9 264L-475.6 253.1L-472.8 241.5L-476.4 236.7L-483.6 238.2L-488 232.6L-492.5 232.6L-497.1 233.5L-505.5 236.9L-512.9 235.6L-522.2 237.9L-536 228.3L-536.8 225.3L-540.5 221.6L-541.2 219.8L-544.7 218L-546.1 216.2L-546.4 212.2L-549 209.1L-546.4 206.6L-545.2 202.3L-545.2 194.2L-547.4 191.7L-547.1 189.2L-545.2 187L-544.4 184.1L-541.9 181.9L-540.1 177.1L-538.3 176.1L-536.5 173.2L-535.1 172.1L-532.5 171.8L-526.6 166.9L-527.3 163.4L-525.8 159.5L-524 157.7L-519.2 155.2L-516.5 150.7L-514.4 150.7L-512.8 151.9L-506 152.3L-495.9 148.3L-485.2 148L-482.6 146.9L-476.6 147.4L-473.6 146.2L-471.6 146.6L-471.7 148L-469.4 147L-469.2 147.5L-470.6 148.9L-470.6 150.1L-469.6 150.8L-470 153.2L-471.8 154.6L-471.3 156.2L-469.8 156.2L-468.1 158L-457.7 160.4L-456.4 162.8L-447 165.9L-444.3 163.9L-444.9 161.8L-444.1 160.4L-440.2 158.8L-436.4 159.3L-435.5 160.6L-430.8 161.4L-430.1 162.3L-426.4 162.3L-419.7 164.3L-416.4 162.6L-414 162.3L-412 162.7L-411.2 164.1L-410.6 163.2L-406.2 164L-404 162.4L-400 153.8L-399.6 150.5L-400.6 149.2L-399.6 148.2L-403.6 147.8L-405.5 149.4L-409.7 149.7L-411.9 148.2L-414.9 148.1L-415.6 149.3L-417.5 149.6L-420.2 148.1L-423.2 148.2L-426.9 143.9L-425.5 141.7L-427.3 140.4L-424.2 137.7L-419.9 137.6L-418.8 135.5L-413.5 135.9L-406.9 133.3L-402.3 133.2L-393.5 136.3L-387.9 136.1L-384.6 134.6L-384.9 131.5L-398.1 124.3L-396.1 123.9L-393.8 121.6L-395.4 120.5L-391.3 119.3L-391.3 118.7L-402.9 121.5L-402.7 123.2L-398.5 123.7L-399.1 124.7L-405.9 126.8L-407.4 126.2L-406.8 124.9L-409.9 124.1L-406.7 122.6L-407.5 122L-411.8 121.3L-412 120.3L-414.6 120.6L-417.7 124.9L-419.9 125.2L-420.7 128.6L-423.1 131.7L-421.9 134.4L-419.5 135.3L-420 136L-423.3 136.1L-426.8 138.5L-427.6 136.6L-430.8 136.3L-434.1 137L-432.2 138.5L-433.6 139L-435.2 139L-436.6 137.6L-437.1 138.2L-435.1 141.1L-436.2 141.7L-433.3 143.8L-433.2 145.4L-435.8 144.7L-435 146.1L-436.7 146.4L-435.7 148.8L-437.5 148.9L-439.8 147.7L-441.3 143.6L-446.1 138.2L-445.7 134.1L-447.6 132.6L-455.5 129.1L-457.8 127.1L-457.3 126.9L-458.6 124.8L-460.4 124.3L-461.2 125.5L-462.1 124.6L-461.3 123.4L-463.5 123L-465.8 123.9L-465.9 126.1L-465 127.5L-462.4 128.9L-461 131.2L-457.9 133.5L-455.8 133.4L-455.1 134.1L-455.9 134.6L-448.7 138.4L-449.2 139.4L-450.7 138.1L-453.1 137.7L-454.3 139.5L-452.3 140.5L-452.6 141.9L-453.8 142.1L-455.3 144.5L-456.4 144.7L-455.3 141.8L-457.2 138.8L-462.1 135.6L-466.4 134.2L-470.8 130.7L-471.7 128L-475.3 126.8L-481.9 130.2L-487.3 129.4L-491.4 130.3L-491.6 133.6L-494.2 135.5L-497.7 136.1L-500.8 140.8L-499.7 142.4L-501.3 143.6L-501.9 145.4L-504 146L-506 148.1L-512.1 148.1L-514.9 150.1L-516.3 149.9L-518.1 147.4L-524.7 147.6L-524.6 143.7L-526.5 142.4L-524.4 136.8L-525 131.7L-526.1 130.5L-522.2 128.5L-505.3 129.4L-503.8 127.7L-503.3 122.2L-508.2 117.9L-512.5 116.8L-512.8 114.8L-509.2 114.2L-504.5 114.9L-505.4 111.7L-502.7 112.9L-496.3 110.8L-495.4 108.5L-489.4 106.6L-486.9 102.5L-480.3 100.9L-477.4 101.3L-475.6 99.9L-477.4 95.8L-477.5 92.9L-476.3 91.4L-470.6 89.6L-471.5 92L-469.7 93.2L-473.2 95.9L-472.4 98.3L-469.6 99L-469.6 100L-465.2 98.7L-460.8 100.7L-451 97.6L-445.4 98.8L-444.8 97.6L-440.9 96.7L-441.4 92.3L-440.1 90.5L-437.4 89.6L-435.2 91.7L-433 91.6L-432.1 87.8L-433.2 88.2L-434.9 87.2L-435.2 85.6L-428.2 84.4L-422.3 84.8L-419.1 83.3L-422 81.9L-436.5 83.8L-440.8 81.3L-440.2 78.6L-441.5 76.1L-440.2 74.5L-429.5 69.1L-429.7 68L-433.6 66.6L-438.4 67.4L-441.1 69.4L-440.6 71.1L-450.4 75.7L-452.4 79.6L-447.8 83.1L-450.4 86.2L-453.3 86.9L-454.3 91.6L-455.9 94.2L-459.3 93.9L-460.8 96.1L-464 96.2L-469.4 86.5L-471.2 84.8L-476.7 88L-480.4 88.7L-484.3 87.3L-486.1 77.9L-483.6 76.1L-476.2 73.7L-470.8 70.9L-459 61.6L-446.7 56.1L-440.6 54.8L-436 55L-431.8 52.7L-421.8 52.3L-413.1 54.3L-416.7 55L-413.6 56.8L-410.7 55.8L-406.2 57.5L-398.6 58.2L-385.9 62.6L-385.8 64.5L-388.8 65.9L-393.4 66.7L-405.8 64.6L-407.8 64.9L-403.3 66.9L-402.9 71.1L-397.2 72.6L-396.8 71.3L-398.6 70.1L-396.7 69L-390 70.8L-387.7 70.1L-389.5 68.1L-383.1 65.3L-377.9 66.5L-376.3 64.6L-378.6 62.9L-377.3 61.2L-379.3 59.5L-371.5 60.4L-369.9 62L-373.5 62.3L-373.4 63.9L-371.3 64.8L-367 64.2L-366.3 62.4L-350.8 58.7L-348.7 58.9L-351.4 60.6L-348 60.8L-346 59.9L-340.8 59.8L-336.7 58.7L-333.5 60.3L-330.3 58.5L-333.3 56.9L-331.8 56L-323.6 56.8L-309.7 60.9L-307.8 59.4L-310.7 57.3L-314.1 57.1L-313.2 55.8L-314.7 52.7L-309.6 50.2L-307.8 47.7L-305.7 47.1L-298.4 47.8L-297.8 49.4L-300.4 51.6L-298.7 52.5L-297.8 54.5L-298.4 58.3L-295.4 60L-296.6 61.8L-302 65.8L-298.8 66.2L-294.7 64.5L-293.9 63.1L-291.5 61.8L-293.1 60.2L-291.8 58.4L-294.9 58.1L-295.6 56.6L-293.3 53.8L-296.9 51.5L-292 49.7L-292.6 47.7L-291.2 47.6L-289.8 49.2L-290.9 51.8L-287.9 52.4L-289.2 50.4L-284.5 49.3L-278.7 49.1L-273.6 50.7L-276.1 48.4L-276.4 45.4L-258.8 44.6L-261.1 43.2L-257.9 41.3L-241.9 39.5L-241 38.8L-231.5 39.1L-225.2 37.6L-220.1 37.7L-216.7 35.3L-210.1 34.2L-205.4 35.1L-209.2 35.8L-202.9 36.2L-202.1 37.6L-191.5 36.9L-183 39.3L-183.7 40.8L-196.1 43.9L-188.6 45L-186.1 44.5L-184.6 46.3L-179 45.1L-170.1 45.6L-169.4 46.9L-157.8 47.3L-157.6 45.2L-147.3 45.7L-142.8 47.1L-141.5 48.9L-143.2 50.1L-139.7 52.2L-135.3 53.4L-132.6 50.5L-128.2 51.7L-123.4 51L-118.1 51.8L-116 51L-111.5 51.4L-113.5 48.8L-109.8 47.6L-84.7 49.4L-82.4 51.1L-75.1 53.2L-58.3 53.1L-56 54.3L-56.4 56.3L-52.9 57.1L-33.8 56.7L-29 59.2L-25.5 58.3L-27.8 56.5L-26.5 55.3L-11.9 55.9L0 58.4ZM636.4 135.3L637.8 137.3L640 138.2L637.7 138.4L636.7 141.5L635.7 142.2L636.7 145.6L641.2 147.6L645.2 148.1L649.5 147.3L649.7 141.8L647.5 140.9L648.2 139L646.4 138.8L647 136.5L649.6 137.1L652 136.2L649.2 133L647 133.7L646.7 135.7L645.8 131.1L642.6 130.2L639.7 126.1L642.4 126.3L642.5 124.3L647.3 124.3L647.3 119.9L642.2 119.3L636.4 121.1L635.1 122.8L632.4 123.2L629.7 126.1L632.2 128.7L631.9 130.6L636.4 135.3ZM234.3 58L232.6 59L222.8 57.2L227.2 55.2L234.3 58ZM0 51.3L0 53.2L-3.1 53.4L-3.5 52.5L0 51.3ZM0 51.3L6.7 52L0 53.2L0 51.3ZM248.5 57L248.5 59.8L252.2 57.6L255.5 59.4L254.7 61.5L257.4 63.3L262.3 58.9L262.4 55.9L270.5 56.5L274.2 57.9L274.4 59.3L272.3 60.7L274.3 62.2L273.9 63.6L268.5 65.5L264.6 66L261.8 65.1L257.4 70.1L254.2 71.9L250.2 72.1L248 73.3L247.9 75.1L244.6 75.5L241.2 77.7L238.2 80.8L237.1 83L237 86.3L241.1 86.7L243.6 91.4L247.5 90.9L263.9 96.4L271.5 96.8L271 99.2L271.9 102L273.9 105.1L278 107.8L280.2 106.9L281.7 104L280.2 99.6L278.3 98.1L282.7 96.8L287.4 93L287.2 91.1L285.3 88.7L281.9 86.7L285.2 83.7L283 76.9L285 76.2L292.6 77.3L294.9 76.5L300.9 79.1L301.7 80.2L306.7 80.4L307.5 86.2L310.1 86.7L312.1 88.3L316.1 86.8L320.6 82.4L329.5 91.8L328.3 93.5L334.5 96.7L340.7 98.3L341.8 100.6L345.1 102L345.3 105.1L341.3 107.2L336.7 108.2L333.2 110.4L315.6 110.5L313.2 112.5L309.7 113.7L302.5 119.9L304.8 119.5L309.3 115.8L315.1 113.5L319.3 113.2L321.7 114.6L319.1 116.5L320.9 121.6L324.5 122.9L329.1 122.5L331.9 119.4L332.1 121.4L333.9 122.4L321.5 127L318.4 129L316.3 128.8L316.2 126.5L321 124.2L313.5 124.6L314 125.5L305.2 128.7L303.6 130.5L303.3 132.4L304.2 133.9L305.3 133.9L305 132.9L305.9 133.5L305.7 134.3L295.3 136.3L300.2 136.3L294.6 136.8L293.7 137.6L294.6 137.7L294 139.7L291.9 141.8L290.2 140.3L291.5 143.3L289.1 146.6L289.7 144.6L288.2 143.6L287.9 141.3L287.4 142.5L288 144.2L286.2 143.8L288.1 144.7L289.6 151.2L287.9 153.3L280.4 157L274.1 162.7L274.1 166.6L277.6 175.3L276.7 180L274.5 180L273 178.1L269.8 172.5L270.4 170.7L269.6 169.2L266.4 166.4L263.6 167.7L260 165.6L252.3 165.8L251.1 166.2L252.2 168.6L249.6 169.1L247.6 169L245.5 167.6L239.3 167.5L231.7 171.4L229.5 173.9L230.2 178.1L228.6 182.6L228.1 187.7L230 192.7L232.5 196.3L233.6 197.7L236.6 198.4L237.7 199.6L244.3 198L247.9 196.4L249.2 191.7L254 190.3L258.2 190.2L258.8 192.1L256.6 195.4L257.1 195.9L256 199.3L254.7 198.6L255.3 199L254.6 204.1L253 205.9L255.2 206.4L263.9 205.6L268.3 207.6L268.9 210.2L267.2 219.2L271.6 225L273.8 225.6L279 223.3L286.6 226L289.8 223.8L290.3 220.5L291.9 219.2L296.1 218.8L300.7 215.5L302.4 216.4L301.8 217.9L300.1 218.3L301 221L299.8 222.6L300.8 224.8L302 224.6L302.7 222.6L301.7 219.5L305.1 218.4L304.7 217.1L305.7 216.2L306.7 218.2L308.7 218.2L310.6 220.7L316 220.4L319.8 222L321.3 220.4L328.1 220.2L325.8 221.1L326.7 222.4L328.9 222.6L331 223.9L331.5 226.2L332.9 226.1L335.8 227.8L337.5 229.6L337.6 231L341.3 233.4L350.1 234L353.1 235L356.5 238.5L357.5 238.3L359.7 244.7L361.2 245.2L361.3 247.1L359.2 249.4L360 250.2L364.9 250.7L365 253.4L367.2 251.6L375.3 254.3L376.6 255.9L376.2 257.5L379.4 256.6L384.8 258.1L388.9 258L396.6 263.4L401.1 264.3L402.1 265.2L403.5 270.4L402.4 275L392.6 286.3L390.9 299.6L389.6 304.4L386.7 308.1L386.3 310.9L384 312.1L383.4 313.8L376 314.9L367.6 319.1L365.3 321.9L365.3 325.5L364.2 329.7L362.3 331.2L359.2 336.1L354.8 339.6L350.5 345.5L347.4 347.1L343.8 346.8L339.4 345.7L337.7 344.2L337.5 345.6L341 348L340.7 349.9L342.4 351.1L342.3 352.5L339.6 356.1L335.5 357.6L326.8 357.9L327.4 363L325.7 364L322.9 364.4L320.2 363.3L319.1 364.1L319.5 366.8L321.4 367.7L322.9 366.8L323.7 368.2L318.9 370.8L317.9 375.1L315.3 375.1L313.1 376.5L312.3 378.6L315 380.6L317.7 381.2L316.7 383.7L313.4 385.3L311.6 388.5L308 390.9L308.8 393.8L310.7 395.4L307.1 395.3L303.2 396.9L302.8 399.5L298.5 398.7L291.8 395.2L290 385.2L291.2 382.5L294.1 380.4L289.9 379.6L292.5 377.1L293.5 372.5L296.6 373.5L298 367.7L296.1 367L295.3 370.5L293.5 370.1L295.3 361L296.6 359.1L295.6 353.2L296.8 353.1L301.6 340.1L300.9 335.9L301.8 333.6L301.4 330.2L303 326.8L305.3 309.4L305.1 304.9L304.5 301L301.7 299.4L301.5 298.2L288.9 290.7L287.7 288.4L288.2 287.6L278.4 270L274.3 267L275.2 265.8L273.9 263.2L278.4 257.4L277.8 256.2L276.8 257.5L275.1 256.2L275.2 252.9L276.2 252.5L277.5 247.9L281 246.2L280.6 245.3L281.6 245.1L282.1 242.7L283.5 242.5L285.8 239.3L284.7 238.6L284.8 231.4L282.7 229.1L282.1 227.6L282.8 226.9L280.2 225L279 225.2L276.4 227.5L277.8 229L275.3 229.9L274.8 228.3L273.6 228.6L273 227.5L269.9 227L269.9 227.6L268 226.5L267.7 224.9L264 222L263.6 223.5L262.1 222.4L262.1 220.1L261.3 219.7L261.9 219.2L256.5 214.1L257.5 213.9L257 213.1L254.2 213.4L246.6 211.3L240.7 206.6L237 205L231.8 206.5L219.9 202.3L216.9 200.2L212.5 199.2L207 194.6L206.3 193.2L207.2 193L207.6 190.5L205.5 186.7L198.9 180.1L196.5 178.9L196.4 176.5L193.4 174.5L192.7 172.6L191.2 172.4L188.3 169.6L185.7 163.4L181.2 161.7L181.5 166.2L190 175.9L192.6 182.5L194 182.6L196 185.6L194.4 186.6L193.6 184.9L188.4 181.3L188.1 177.7L180.4 173L181.8 172.9L182.9 170.7L179.1 167.9L174.2 158.2L170.8 155.5L164.9 153.9L164.6 152.3L161.9 149.5L159.7 145L156.3 141.8L155.9 139.5L154.5 138L155 133.3L154.1 131.2L155.8 123.5L155.3 119.8L153.7 116.2L154 115.6L158 116.6L159.5 119.2L160.2 118.4L158.8 113.9L151 110L146 108.8L144.5 106.3L144.9 104.6L141.3 103.5L140.8 101.2L137.5 99.2L137.4 97.8L133.4 95.8L132.6 93.4L129.1 91.2L127.6 88.5L120.5 88.3L111.5 84.6L104 83.1L100.1 83.3L91.4 80.9L88.3 81.5L88.8 83.4L78.6 85.7L78.2 84L79.4 81.3L82.4 80.5L81.6 79.8L72.2 85.1L74.2 86.5L71.6 88.5L65.8 90.5L65.1 91.7L60.8 93.2L59.9 94.5L42.3 98.9L41.8 98.4L50.5 94.7L54 94.4L61.9 90.1L63.8 86.3L60.6 87.2L59.7 86.7L58.2 87.7L56.4 86.3L55.6 87.3L54.6 85.9L50.1 87L50.4 84.3L48.6 83.4L45 83.9L40.7 81.9L40.7 80.4L38.6 79.2L42.9 74.6L47 74.8L49.3 73.5L53.4 72.9L52.9 71.6L51.3 71.1L53.4 70L47.9 71.3L41.8 71L37.7 70.3L33 67.6L43.1 65.1L45.4 65.1L45 66.4L50.9 66.3L40.6 61L36.8 60.1L38.3 58.7L43.3 58.6L46.8 57.3L47.4 56L50.3 54.6L60.8 53.3L65.1 51.8L69.3 52.4L71.3 53.6L77.2 53.2L77 53.9L81.3 54.4L97.4 55.6L101.1 55.1L120.8 58.6L126.6 56.6L130.8 56.9L139.5 55L141.4 56.2L143.4 55.5L144.1 54.2L150.7 57L154.4 55.1L154.8 57.2L159.2 56L162.6 56.1L173.3 58.3L179.9 58.6L183.6 60L179.7 61.4L184.7 62L194.6 61.2L197.6 62.8L200.6 61.4L197.7 60.2L199.5 59.3L205.1 58.9L210.2 61.1L213.3 60.8L218.2 62.1L226.5 61.7L226.2 60L228.7 59.5L233 60.4L233 63.1L234.8 60.9L237 60.9L238.2 58.1L232 55.3L232.2 52.2L235.5 50.2L242 51.9L245.8 55L243.3 56.4L248.5 57ZM182.9 46.9L181.5 48.2L187.7 47.3L191.5 48.7L194.7 47.3L197.2 48.2L199.5 51L200.9 49.8L198.9 47L204.1 47L207.2 48.1L209.8 52.8L219.5 55.5L219.2 56.7L214.6 56.9L216.4 58L215.5 59L205.7 57.8L185.2 59.6L183.7 58.3L177.5 57.9L174.1 55.7L187.7 54.5L172.5 54.1L171 53L177.5 51.9L168.3 51.2L172.6 48L180 46.4L182.9 46.9ZM209.7 46.1L207.3 47.9L202.9 45.9L207.6 45.4L209.7 46.1ZM287.9 46.9L288.2 47.7L279.2 47.9L275.3 46.3L275.5 45.3L276.8 45.1L283.2 45.4L287.9 46.9ZM259.6 46.8L261.7 48.5L264.3 46.3L271.3 45.1L276.1 48L275.7 49.8L283.8 47.9L293.8 50.6L294.2 51.9L299.3 51.2L302.2 53L308.9 54.1L314 57.8L308.9 59.1L319.8 61.5L323.8 64.1L328.2 64.3L327.3 66.2L322.5 69.4L314.7 65.6L311.1 65.9L310.7 67.5L318.6 71.2L320.4 73.9L319.4 75.9L308.9 72.9L316.2 78L302.7 75.2L299.3 73.9L300.3 73.1L292.1 70.3L292.2 71.1L284.1 71.6L281.8 70.6L283.6 68.6L294.6 68.2L293.6 67.2L298.2 63.1L297.4 61.9L292.1 59.6L286.5 58.6L288.3 57.9L285.3 56.2L280.7 55.1L274.2 56.3L264 55.7L253.7 54.4L251.4 53.4L254.3 52.2L250.3 52.2L249.4 49.3L251.6 46.9L254.4 45.7L261.6 45L259.6 46.8ZM221.2 44.9L229.5 45.1L230.2 45.9L227.6 47.2L231.8 48.4L231.3 50.9L224.1 51.8L215.3 48.6L215.3 47.7L221 48L217.9 46.2L221.2 44.9ZM898.9 46.6L888.5 46.2L894.6 44.8L898.9 46.6ZM241.1 47.9L238.1 49.9L235 49.8L233.2 47.4L233.3 46L237.5 44.1L248.6 44.8L244.4 47.3L241.1 47.9ZM165.4 51.7L158.1 53.1L156.6 51.8L150.2 50.4L155.7 45.3L153 43.6L162.4 43.2L173.5 43.9L179.1 45.9L168.8 48.6L165.4 50.5L165.4 51.7ZM918.7 41.4L915.5 42.5L905.9 41.2L906.5 40.3L918.7 41.4ZM240 41.7L238.5 42.8L231.1 41.9L232.5 40.6L236.5 39.9L240 41.7ZM903 40.1L900.8 42.2L886 42.7L880.5 40.9L882 39L885.6 38.5L903 40.1ZM226.4 36.9L228.5 38.2L227.3 41.7L222.8 42L219.8 41.5L219.8 39.9L215.3 40.1L215.1 38L226.4 36.9ZM199.4 38.3L200.5 39.3L205.9 39L206.4 40.3L204.7 41.7L188.3 43.3L184 43.4L183.7 42.4L189.5 41.2L173 41L176.8 38.3L179.4 37.6L187.3 38.5L192.2 40.1L197 40.4L193.1 37.7L195.6 36.7L198.5 37L199.4 38.3ZM659.8 53.6L649.1 53.4L648.4 52.2L643.3 51.5L642.9 50L645.8 49.4L645.7 47.8L651.2 45.5L648.6 45.1L655.3 42.7L654.5 41.4L669.9 38.2L683.9 36.6L689.3 36.3L691.3 37.4L671.1 40.9L662.4 43.6L653.9 49L654.5 51.3L659.8 53.6ZM237 35.8L240.1 36.7L245.5 36.7L247.9 37.6L247.3 38.7L252.3 40L274.6 39.7L277.6 40.7L278.2 41.9L272.4 43.2L250.7 43L243.3 42.1L242 39.2L239.2 38L230.2 36.8L231.3 35.7L237 35.8ZM177.2 34.3L176.8 36.5L174.7 37.4L162.5 39.2L158.7 38.6L169.2 34.7L177.2 34.3ZM239.3 34.7L232.9 34.6L232.1 33.8L237.7 33.8L239.3 34.7ZM193.9 34.2L188.7 35L184.6 34.1L186.9 33.2L194.9 33.3L193.9 34.2ZM568.7 33.7L562.5 34.9L557.6 34.2L559.5 33.5L557.8 32.6L563.6 32.1L564.7 33.1L568.7 33.7ZM195.4 31.7L187.4 32.2L190.3 31L195.4 31.7ZM233.8 33.2L229.7 33.8L227.4 33.1L226 30.9L234.6 32.2L233.8 33.2ZM222.1 32.4L223.1 33.6L207.8 32.3L210.5 31.5L207.2 30.8L207 29.7L219.9 31.1L222.1 32.4ZM791.9 32.5L776.2 33.6L781.3 29.9L783.6 29.6L792.7 31.4L791.9 32.5ZM550.7 28.6L559.8 30.7L552.9 31.8L551.3 33.8L548.9 34.3L547.6 36.6L544.2 36.8L538.2 35.1L540.7 34.1L531.2 30.9L529 28.7L536.6 27.7L538.1 28.7L542.1 28.7L543.1 27.7L547.2 27.6L550.7 28.6ZM570.7 26.6L576.1 27.6L572 29.1L564 29.4L555.8 29L555.3 28.2L551.3 28.2L548.2 26.9L556.8 26.1L560.9 26.8L563.7 26L570.7 26.6ZM642 26.3L632.2 27.8L629.2 27.1L630.8 26.2L624.6 26.1L634.2 25.6L634.8 26.4L639 25.2L643.1 25.8L642 26.3ZM777.6 30.9L763.8 30.4L759.2 29.4L757.1 27.4L753.3 26.8L766.5 24.3L778.3 28.4L777.6 30.9ZM258.3 28.7L261.6 29.6L252.7 32.5L247.8 32.7L242 32.4L239 31.2L239.1 30.2L241.3 29.5L236.2 29.5L231.4 27.3L235.2 25.3L238.1 25.1L236.8 24.4L243.3 24.3L246.9 25.8L256.1 26.9L258.3 28.7ZM309.7 19.1L328.2 20.5L328.1 21.2L312.1 23.6L318.1 23.6L307 26.1L302.3 28.3L286.4 29.7L290.2 30L288.3 30.5L290.6 31.9L278.4 35.5L278.8 36.2L283.6 36L283.6 36.7L276.2 38.4L251.4 37.6L251.1 36.2L256.2 35.6L254.8 33.6L264 34.6L260.2 32.8L255.7 32.3L262.8 30.6L263.6 29.6L259.7 28.5L258.5 27.1L268.3 27.5L272.6 26.5L256.7 26.3L251.8 25.4L246.2 23.5L245.6 22.5L262.5 20.4L268.9 21.3L271.1 19.8L279.7 19.1L309.7 19.1ZM424.7 18L442.1 20.2L437 21.3L411.4 21.7L431 22.8L436.4 22L438.7 23L435.6 24.6L456.2 22.5L464.5 23L466.1 24.2L453.2 26.8L444.3 27.3L450.7 27.4L445.3 31.2L445.4 34.3L448.7 36.2L439.8 37.1L444.9 38.6L445.6 41L442.6 41.2L446.2 43.6L440 43.8L443.2 45L442.3 45.9L434.5 46.4L438 48.3L438.1 49.5L432.6 48.3L431.1 49.1L438.5 51.5L439.6 53.7L434.6 54.2L429 51.6L430 53.5L426.8 54.9L437.9 55.2L422.9 59.8L411.7 60.8L405 64.8L399 66.7L389.4 68.2L387 69.9L387 71.8L385.6 73.7L381.1 75.9L382.2 78.1L379.5 83.1L375.6 83.2L371.5 81L365.9 80.9L356.6 73.3L355.2 71.4L354.8 69L350.9 66.4L351.9 64.3L350.1 63.4L352.8 60.1L357 59.1L358.7 55.8L351.5 57.5L348.1 56.6L347.9 54.8L349 53.3L357.3 54L350 51.3L347.2 51.6L344.9 51L348 48.4L340.8 42.5L337.2 41.4L337.3 40.2L329.8 38.6L309.7 38.7L301.7 36.1L314.5 35.1L296.4 33.2L296.8 32.1L317.5 29.5L318.5 28.5L311 27.5L313.5 26.3L327.1 24.1L326 22.9L341.1 21.7L349.6 21.7L352.7 22.5L360 21L376.3 23.2L369.7 21.7L370.1 20.5L379.4 18.8L389.2 18.9L392.7 17.9L424.7 18Z"/>
+            <clipPath id="mapClip"><rect x="0" y="18" width="1000" height="392"/></clipPath>
+          </defs>
+          <rect x="0" y="18" width="1000" height="392" fill="var(--sea)"/>
+          <g class="grat" id="grat"></g>
+          <g clip-path="url(#mapClip)" class="land">
+            <use href="#landPath" x="-1000"/><use href="#landPath"/><use href="#landPath" x="1000"/>
+          </g>
+          <g id="pins"></g>
+        </svg>
+      </div>
+
+      <div class="map-hint">← <span class="zh-only">左右滑動看完整地圖</span><span class="en-only">swipe to see the whole map</span><span class="ja-only">左右にスワイプで全体表示</span> →</div>
+
+      <div class="map-foot">
+        <div class="legend">
+          <span class="lg" style="width:8px;height:8px"></span>
+          <span class="lg" style="width:14px;height:14px"></span>
+          <span class="lg" style="width:22px;height:22px"></span>
+          <span class="zh-only">越多人，點越大</span><span class="en-only">bigger dot = more people</span><span class="ja-only">人が多いほど大きく</span>
+        </div>
+        <div class="off-map" id="offMap"></div>
+      </div>
+
+      <div class="detail" id="detail"></div>
+    </div>
+
+    <!-- INSIGHT -->
+    <div class="insight" id="insight" style="display:none">
+      <div class="il">THE POINT · <span class="zh-only">這張圖在說什麼</span><span class="en-only">WHAT THE MAP SAYS</span><span class="ja-only">この地図が語ること</span></div>
+      <div class="iq" id="insightQ"></div>
+      <div class="ib" id="insightB"></div>
+    </div>
+
+    <!-- COUNTRY CARDS -->
+    <div class="card">
+      <div class="card-label">SIDE BY SIDE · <span class="zh-only">各地對照</span><span class="en-only">SIDE BY SIDE</span><span class="ja-only">地域ごとの比較</span></div>
+      <h2 class="card-title zh-only">同一份測驗，不同的街道</h2>
+      <h2 class="card-title en-only">Same quiz, different streets</h2>
+      <h2 class="card-title ja-only">同じ診断、ちがう街</h2>
+      <p class="card-sub" id="cGridSub"></p>
+      <div class="c-grid" id="cGrid"></div>
+    </div>
+
+    <div class="two-col">
+      <!-- TAIWAN -->
+      <div class="card" id="twCard">
+        <div class="card-label">TAIWAN · <span class="zh-only">台灣縣市</span><span class="en-only">TAIWAN BY COUNTY</span><span class="ja-only">台湾の県市</span></div>
+        <h2 class="card-title zh-only">台灣，哪裡的人最多？</h2>
+        <h2 class="card-title en-only">Taiwan, county by county</h2>
+        <h2 class="card-title ja-only">台湾はどこが多い？</h2>
+        <p class="card-sub zh-only">目前有填縣市的參與者分布。</p>
+        <p class="card-sub en-only">Participants who told us their county.</p>
+        <p class="card-sub ja-only">県市を回答した参加者の分布です。</p>
+        <div class="rank-list" id="twList"></div>
+      </div>
+
+      <!-- TYPES -->
+      <div class="card">
+        <div class="card-label">16 SOULS · <span class="zh-only">全球型態分布</span><span class="en-only">GLOBAL TYPE SPREAD</span><span class="ja-only">世界のタイプ分布</span></div>
+        <h2 class="card-title zh-only">全世界，哪一型最多？</h2>
+        <h2 class="card-title en-only">Which soul is most common?</h2>
+        <h2 class="card-title ja-only">世界で多いのはどのタイプ？</h2>
+        <p class="card-sub zh-only">16 型在所有參與者中的比例。</p>
+        <p class="card-sub en-only">Share of each of the 16 types across all participants.</p>
+        <p class="card-sub ja-only">全参加者のなかでの16タイプの割合です。</p>
+        <div class="rank-list" id="typeList"></div>
+      </div>
+    </div>
+
+    <a class="cta" id="ctaLink" href="index.html">
+      <div class="ct zh-only">還沒測過？來加上你的那一點</div>
+      <div class="ct en-only">Not on the map yet? Add your dot</div>
+      <div class="ct ja-only">まだの人は、あなたの点をひとつ</div>
+      <div class="cs zh-only">12 題，大約 3 分鐘 · 免費、不用註冊</div>
+      <div class="cs en-only">12 questions, about 3 minutes · free, no sign-up</div>
+      <div class="cs ja-only">全12問・約3分 · 無料、登録不要</div>
+    </a>
+
+    <div class="privacy">
+      <b class="zh-only">關於這張地圖的資料</b><b class="en-only">About the data on this map</b><b class="ja-only">この地図のデータについて</b><br>
+      <span class="zh-only">這裡只呈現<b>彙總統計</b>：國家／地區、台灣縣市、型態分布。不顯示任何個人資料，也沒有任何一列代表得出某一個人。你填的暱稱只留在你自己的瀏覽器裡，從來沒有上傳過。跨國比較只採用樣本數足夠的地區（目前門檻：<b id="pvMin">5</b> 人），樣本太少的地方只會計入總數。</span>
+      <span class="en-only">This page shows <b>aggregate statistics only</b>: country/region, Taiwanese county, and type distribution. No personal data is shown, and no row here identifies anyone. The nickname you typed stays in your own browser and has never been uploaded. Cross-country comparisons only use places with enough responses (current threshold: <b class="pvMin">5</b>); smaller samples still count toward totals.</span>
+      <span class="ja-only">このページに表示されるのは<b>集計データのみ</b>です（国・地域、台湾の県市、タイプ分布）。個人情報は表示されず、特定の個人がわかる行もありません。入力したニックネームはご自身のブラウザにのみ保存され、送信されたことはありません。国際比較はサンプル数が十分な地域のみ（現在のしきい値：<b class="pvMin">5</b>人）を使い、少ない地域は合計にのみ含めます。</span>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    A PROJECT BY <strong>Vision Zero Taiwan</strong> × <strong>TCAN</strong><br>
+    <span class="zh-only">還路於民行人路權促進會 · 台灣氣候行動網絡</span>
+    <span class="en-only">Vision Zero Taiwan · Taiwan Climate Action Network</span>
+    <span class="ja-only">還路於民行人路権促進会 · 台湾気候行動ネットワーク</span><br>
+    CURATION &amp; DATA · <strong>Yun Ching Wu</strong> · <span id="lastUpdate">—</span><br>
+    <span style="opacity:.8">Basemap: Natural Earth (public domain), via <a href="https://github.com/topojson/world-atlas" target="_blank" rel="noopener">world-atlas</a> (ISC)</span>
+  </div>
+
+</div>
+
+<script src="config.js" onerror="window.SSQ_CONFIG=window.SSQ_CONFIG||{}"></script>
+<script>
+/* ============================================================
+   世界街道靈魂地圖 · World Street Soul Map
+   彙總統計，無個資。資料來源與 dashboard.html 相同的 Sheet CSV。
+   ============================================================ */
+
+const CFG = window.SSQ_CONFIG || {};
+const CSV_URL = CFG.SHEET_CSV_URL || '';
+const MIN_SAMPLE = CFG.MIN_SAMPLE || 20;          // 顯示門檻：低於此數的地區只計入總數
+const INSIGHT_MIN = Math.max(MIN_SAMPLE, CFG.INSIGHT_MIN || 30);  // 下結論門檻，另加顯著性檢定
+
+/* ---------- 16 types ---------- */
+const TYPES = {
+  MECY:{e:'🦉',zh:'城市觀察家',en:'The Urban Observer',ja:'街の観察者'},
+  MECI:{e:'🐱',zh:'街角分享家',en:'The Corner Connector',ja:'街角のつなぎ手'},
+  MESY:{e:'🐢',zh:'漫遊思考者',en:'The Wandering Thinker',ja:'歩く思索者'},
+  MESI:{e:'🦋',zh:'散步詩人',en:'The Stroll Poet',ja:'散歩の詩人'},
+  MHCY:{e:'🐶',zh:'鄰里大使',en:'The Neighborhood Ambassador',ja:'ご近所の大使'},
+  MHCI:{e:'🐰',zh:'早市好朋友',en:'The Market Mingler',ja:'朝市の仲よし'},
+  MHSY:{e:'🐼',zh:'街道守護者',en:'The Street Steward',ja:'街の見守り人'},
+  MHSI:{e:'🦔',zh:'黃昏散步家',en:'The Twilight Stroller',ja:'たそがれの散歩人'},
+  RECY:{e:'🦊',zh:'通勤革新者',en:'The Commute Innovator',ja:'通勤のイノベーター'},
+  RECI:{e:'🐬',zh:'城市衝浪者',en:'The City Surfer',ja:'街のサーファー'},
+  RESY:{e:'🦅',zh:'路線設計師',en:'The Route Architect',ja:'ルートの設計者'},
+  RESI:{e:'🐎',zh:'自由騎士',en:'The Free Rider',ja:'自由のライダー'},
+  RHCY:{e:'🐘',zh:'大眾運輸推手',en:'The Transit Advocate',ja:'公共交通の推進者'},
+  RHCI:{e:'🐝',zh:'通勤好夥伴',en:'The Commute Companion',ja:'通勤の相棒'},
+  RHSY:{e:'🐜',zh:'高效規劃師',en:'The Efficiency Designer',ja:'効率のプランナー'},
+  RHSI:{e:'🦝',zh:'通勤忍者',en:'The Commute Ninja',ja:'通勤の忍者'}
+};
+
+/* ---------- countries: label + map anchor [lon, lat] ----------
+   Anchors for mapped countries are centroids of each country's largest
+   landmass, computed from Natural Earth 110m. HK/SG are city-states too
+   small to appear at this scale, so they use their own coordinates. */
+const COUNTRIES = {
+  TW:{em:'🇹🇼',zh:'台灣',en:'Taiwan',ja:'台湾',ll:[121.11,23.86]},
+  JP:{em:'🇯🇵',zh:'日本',en:'Japan',ja:'日本',ll:[138.4,36.5]},
+  KR:{em:'🇰🇷',zh:'韓國',en:'South Korea',ja:'韓国',ll:[127.47,36.72]},
+  HK:{em:'🇭🇰',zh:'香港',en:'Hong Kong',ja:'香港',ll:[114.17,22.32]},
+  SG:{em:'🇸🇬',zh:'新加坡',en:'Singapore',ja:'シンガポール',ll:[103.82,1.35]},
+  MY:{em:'🇲🇾',zh:'馬來西亞',en:'Malaysia',ja:'マレーシア',ll:[102.3,3.9]},
+  CN:{em:'🇨🇳',zh:'中國',en:'China',ja:'中国',ll:[105.67,37.31]},
+  US:{art:'the ',em:'🇺🇸',zh:'美國',en:'USA',ja:'アメリカ',ll:[-98.5,39.4]},
+  CA:{em:'🇨🇦',zh:'加拿大',en:'Canada',ja:'カナダ',ll:[-97.5,56.4]},
+  UK:{art:'the ',em:'🇬🇧',zh:'英國',en:'UK',ja:'イギリス',ll:[-2.4,53.2]},
+  DE:{em:'🇩🇪',zh:'德國',en:'Germany',ja:'ドイツ',ll:[10.69,51.04]},
+  FR:{em:'🇫🇷',zh:'法國',en:'France',ja:'フランス',ll:[2.6,46.8]},
+  NL:{art:'the ',em:'🇳🇱',zh:'荷蘭',en:'Netherlands',ja:'オランダ',ll:[5.65,52.4]},
+  AU:{em:'🇦🇺',zh:'澳洲',en:'Australia',ja:'オーストラリア',ll:[133.25,-25.6]},
+  OTHER:{em:'🌍',zh:'其他地區',en:'Elsewhere',ja:'その他の地域',ll:null}
+};
+
+const TW_CITY_EN = {
+  '台北市':'Taipei','新北市':'New Taipei','桃園市':'Taoyuan','台中市':'Taichung',
+  '台南市':'Tainan','高雄市':'Kaohsiung','基隆市':'Keelung','新竹市':'Hsinchu City',
+  '新竹縣':'Hsinchu County','苗栗縣':'Miaoli','彰化縣':'Changhua','南投縣':'Nantou',
+  '雲林縣':'Yunlin','嘉義市':'Chiayi City','嘉義縣':'Chiayi County','屏東縣':'Pingtung',
+  '宜蘭縣':'Yilan','花蓮縣':'Hualien','台東縣':'Taitung','澎湖縣':'Penghu',
+  '金門縣':'Kinmen','連江縣':'Lienchiang'
+};
+
+/* ---------- four axes ---------- */
+const AXES = [
+  {i:0,l:'M',r:'R',zh:['漫','速'],en:['Mellow','Rapid'],ja:['ゆっくり','はやい']},
+  {i:1,l:'E',r:'H',zh:['探','熟'],en:['Explore','Habit'],ja:['探索','いつもの']},
+  {i:2,l:'C',r:'S',zh:['群','獨'],en:['Crew','Solo'],ja:['みんな','ひとり']},
+  {i:3,l:'Y',r:'I',zh:['系統','我'],en:['System','Self'],ja:['仕組み','わたし']}
+];
+
+/* ---------- i18n ---------- */
+let LANG = 'zh';
+function L(zh,en,ja){ return LANG==='en' ? en : LANG==='ja' ? ja : zh; }
+function tName(code){ const t=TYPES[code]; return t ? t[LANG] || t.zh : code; }
+function cName(cc){ const c=COUNTRIES[cc]; return c ? c[LANG] || c.zh : cc; }
+function cEmoji(cc){ return (COUNTRIES[cc]||{}).em || '🌍'; }
+/* English needs an article for a few of these ("in the Netherlands"). */
+function cNameIn(cc){
+  const c = COUNTRIES[cc] || {};
+  return (LANG === 'en' && c.art ? c.art : '') + cName(cc);
+}
+function people(n){ return L(n.toLocaleString()+' 人', n.toLocaleString()+(n===1?' person':' people'), n.toLocaleString()+'人'); }
+
+function setLang(lang, persist){
+  LANG = ['zh','en','ja'].includes(lang) ? lang : 'zh';
+  document.body.className = LANG;
+  document.documentElement.lang = LANG==='en' ? 'en' : LANG==='ja' ? 'ja' : 'zh-TW';
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('on', b.dataset.lang===LANG));
+  const q = LANG==='zh' ? '' : '?lang='+LANG;
+  const back = document.getElementById('backLink'), cta = document.getElementById('ctaLink');
+  if(back) back.href = 'index.html'+q;
+  if(cta) cta.href = 'index.html'+q;
+  if(persist){ try{ localStorage.setItem('ssq-lang', LANG); }catch(e){} }
+  if(STATE.rows) render(STATE.rows);
+}
+
+/* ---------- projection (equirectangular, matches the inline basemap) ---------- */
+const projX = lon => (lon + 180) / 360 * 1000;
+const projY = lat => (90 - lat) / 180 * 500;
+
+/* ---------- CSV ---------- */
+function parseCSV(text){
+  const lines = text.trim().split(/\r?\n/);
+  if(lines.length < 2) return [];
+  const headers = parseLine(lines[0]);
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const cells = parseLine(lines[i]);
+    if(cells.length < 2) continue;
+    const o = {};
+    headers.forEach((h,idx)=>{ o[h.trim()] = (cells[idx]||'').trim(); });
+    rows.push(o);
+  }
+  return rows;
+}
+function parseLine(line){
+  const out=[]; let cur='', inQ=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch === '"'){ if(inQ && line[i+1] === '"'){ cur+='"'; i++; } else inQ=!inQ; }
+    else if(ch === ',' && !inQ){ out.push(cur); cur=''; }
+    else cur+=ch;
+  }
+  out.push(cur);
+  return out;
+}
+
+/* ---------- aggregation ---------- */
+function aggregate(rows){
+  const byCountry={}, byCity={}, byType={}, axisAll={};
+  let typed=0, today=0, latest=null;
+  const dayAgo = Date.now() - 86400000;
+
+  rows.forEach(r=>{
+    const code = (r.type_code||'').toUpperCase();
+    if(!TYPES[code]) return;              // ignore malformed / header echoes
+    typed++;
+    byType[code] = (byType[code]||0)+1;
+    AXES.forEach(a=>{ const k=code[a.i]; axisAll[k]=(axisAll[k]||0)+1; });
+
+    let cc = (r.country||'').trim().toUpperCase();
+    if(cc && !COUNTRIES[cc]) cc = 'OTHER';
+    if(cc){
+      const b = byCountry[cc] || (byCountry[cc] = {n:0, types:{}, axis:{}});
+      b.n++;
+      b.types[code] = (b.types[code]||0)+1;
+      AXES.forEach(a=>{ const k=code[a.i]; b.axis[k]=(b.axis[k]||0)+1; });
+    }
+    if(cc === 'TW'){
+      const city = (r.city||'').trim();
+      if(city) byCity[city] = (byCity[city]||0)+1;
+    }
+    const ts = Date.parse(r.timestamp||'');
+    if(!isNaN(ts)){
+      if(ts > dayAgo) today++;
+      if(!latest || ts > latest.ts) latest = {ts, cc, code};
+    }
+  });
+
+  return {total:typed, byCountry, byCity, byType, axisAll, today, latest};
+}
+
+function domType(types){
+  const e = Object.entries(types).sort((a,b)=>b[1]-a[1]);
+  return e.length ? e[0] : null;
+}
+function axisShare(axis, a){
+  const l = axis[a.l]||0, r = axis[a.r]||0, t = l+r;
+  return t ? l/t : null;                      // share of the LEFT letter
+}
+
+/* ---------- the auto-generated headline ----------
+   跨國差異只有同時通過三關才會被寫成結論：
+   (1) 兩邊樣本都 >= INSIGHT_MIN
+   (2) 兩比例 z 檢定 z >= 1.96（雙尾 p < .05）
+   (3) 差距至少 8 個百分點
+   否則寧可不下結論 — 這些數字會被引用。 */
+function zDiff(p1,n1,p2,n2){
+  const p = (p1*n1 + p2*n2) / (n1+n2);
+  const se = Math.sqrt(p*(1-p)*(1/n1 + 1/n2));
+  return se ? Math.abs(p1-p2)/se : 0;
+}
+
+function pickInsight(agg){
+  const pool = Object.entries(agg.byCountry)
+    .filter(([cc,b]) => cc !== 'OTHER' && b.n >= INSIGHT_MIN);
+  if(pool.length < 2) return null;
+
+  let best = null;
+  AXES.forEach(a=>{
+    const vals = pool.map(([cc,b]) => ({cc, n:b.n, s:axisShare(b.axis, a)})).filter(v=>v.s !== null);
+    if(vals.length < 2) return;
+    vals.sort((x,y)=>y.s - x.s);
+    const hi = vals[0], lo = vals[vals.length-1];
+    const spread = hi.s - lo.s;
+    if(spread < 0.08) return;                        // too small to be interesting
+    const z = zDiff(hi.s, hi.n, lo.s, lo.n);
+    if(z < 1.96) return;                             // not distinguishable from noise
+    if(!best || spread > best.spread) best = {axis:a, hi, lo, spread, z};
+  });
+  return best;
+}
+
+/* ---------- render ---------- */
+const STATE = {rows:null, sel:null, demo:false, scrolled:false};
+
+function render(rows){
+  const agg = aggregate(rows);
+  STATE.agg = agg;
+
+  if(agg.total === 0){ show('empty'); return; }
+  show('content');
+
+  /* top-line stats */
+  const placed = Object.keys(agg.byCountry).length;
+  document.getElementById('sTotal').innerHTML = agg.total.toLocaleString() + '<span class="stat-unit">' + L('人','','人') + '</span>';
+  document.getElementById('sTotalMeta').textContent = L('自測驗上線以來','since launch','公開してから');
+  document.getElementById('sPlaces').textContent = placed || '—';
+  document.getElementById('sPlacesMeta').textContent = placed
+    ? L('有人留下足跡的地方','with at least one soul','だれかが足あとを残した場所')
+    : L('尚無地區資料','no region data yet','地域データなし');
+  document.getElementById('sToday').innerHTML = agg.today.toLocaleString() + '<span class="stat-unit">' + L('人','','人') + '</span>';
+  document.getElementById('sTodayMeta').textContent = L('過去 24 小時','last 24 hours','過去24時間');
+
+  const lt = agg.latest;
+  document.getElementById('sLatest').textContent = lt
+    ? TYPES[lt.code].e + ' ' + tName(lt.code)
+    : '—';
+  document.getElementById('sLatestMeta').textContent = lt
+    ? (lt.cc ? cEmoji(lt.cc) + ' ' + cName(lt.cc) + ' · ' : '') + relTime(lt.ts)
+    : L('尚無時間資料','no timestamps yet','時刻データなし');
+
+  document.querySelectorAll('#pvMin,.pvMin').forEach(el=>el.textContent = MIN_SAMPLE);
+
+  renderGraticule();
+  renderPins(agg);
+  renderOffMap(agg);
+  renderInsight(agg);
+  renderCountryCards(agg);
+  renderTaiwan(agg);
+  renderTypes(agg);
+
+  if(STATE.sel && agg.byCountry[STATE.sel]) selectCountry(STATE.sel);
+  else renderDetailEmpty();
+
+  document.getElementById('lastUpdate').textContent =
+    L('更新於 ','UPDATED ','更新 ') + new Date().toLocaleTimeString(LANG==='ja'?'ja-JP':LANG==='en'?'en-US':'zh-TW',{hour:'2-digit',minute:'2-digit'});
+}
+
+function relTime(ts){
+  const m = Math.floor((Date.now()-ts)/60000);
+  if(m < 1)  return L('剛剛','just now','たった今');
+  if(m < 60) return L(m+' 分鐘前', m+' min ago', m+'分前');
+  const h = Math.floor(m/60);
+  if(h < 24) return L(h+' 小時前', h+' h ago', h+'時間前');
+  const d = Math.floor(h/24);
+  return L(d+' 天前', d+' days ago', d+'日前');
+}
+
+function renderGraticule(){
+  const g = document.getElementById('grat');
+  if(g.childNodes.length) return;
+  let s='';
+  for(let lon=-150; lon<=150; lon+=30) s += `<line x1="${projX(lon)}" y1="18" x2="${projX(lon)}" y2="410"/>`;
+  for(let lat=-60; lat<=80; lat+=20) s += `<line x1="0" y1="${projY(lat)}" x2="1000" y2="${projY(lat)}"/>`;
+  g.innerHTML = s;
+}
+
+function renderPins(agg){
+  const host = document.getElementById('pins');
+  const mapped = Object.entries(agg.byCountry).filter(([cc]) => COUNTRIES[cc] && COUNTRIES[cc].ll);
+  if(!mapped.length){ host.innerHTML=''; return; }
+  const max = Math.max(...mapped.map(([,b])=>b.n));
+  const ranked = mapped.slice().sort((a,b)=>b[1].n - a[1].n);
+
+  // Geometry first, so labels can dodge each other and the other dots.
+  const pins = ranked.map(([cc,b])=>{
+    const [lon,lat] = COUNTRIES[cc].ll;
+    return {cc, b, x:projX(lon), y:projY(lat), r: 7 + 17 * Math.sqrt(b.n / max)};
+  });
+
+  const boxes = pins.map(p=>({x1:p.x-p.r, y1:p.y-p.r, x2:p.x+p.r, y2:p.y+p.r}));
+  const hits = box => boxes.some(o => !(box.x2 < o.x1 || box.x1 > o.x2 || box.y2 < o.y1 || box.y1 > o.y2));
+
+  pins.forEach(p=>{
+    const w = 17 + 7.2 * String(p.b.n).length, h = 13;
+    // below, above, right, left
+    const spots = [
+      [p.x, p.y + p.r + 11], [p.x, p.y - p.r - 5],
+      [p.x + p.r + w/2 + 3, p.y + 4], [p.x - p.r - w/2 - 3, p.y + 4]
+    ];
+    for(const [lx,ly] of spots){
+      const box = {x1:lx-w/2, y1:ly-h, x2:lx+w/2, y2:ly+3};
+      if(box.x1 < 2 || box.x2 > 998 || box.y1 < 20 || box.y2 > 408) continue;
+      if(hits(box)) continue;
+      p.label = {x:lx, y:ly};
+      boxes.push(box);
+      break;
+    }
+  });
+
+  host.innerHTML = pins.map(p=>{
+    const {cc, b, x, y, r} = p;
+    const dom = domType(b.types);
+    const aria = cEmoji(cc) + ' ' + cName(cc) + ' · ' + people(b.n);
+    return `<g class="pin" data-cc="${cc}" tabindex="0" role="button" aria-label="${esc(aria)}">
+      <circle class="halo" cx="${x}" cy="${y}" r="${(r*1.55).toFixed(1)}"/>
+      <circle class="core" cx="${x}" cy="${y}" r="${r.toFixed(1)}"/>
+      ${r >= 13 && dom ? `<text class="pe" x="${x}" y="${y}" font-size="${(r*1.05).toFixed(1)}">${TYPES[dom[0]].e}</text>` : ''}
+      ${p.label ? `<text class="pn" x="${p.label.x.toFixed(1)}" y="${p.label.y.toFixed(1)}" font-size="12">${cEmoji(cc)} ${b.n}</text>` : ''}
+    </g>`;
+  }).join('');
+
+  // 手機上地圖可橫向捲動：開場就對準人最多的地方，而不是停在美洲
+  const box = document.querySelector('.map-box');
+  if(box && !STATE.scrolled){
+    requestAnimationFrame(()=>{
+      const over = box.scrollWidth - box.clientWidth;
+      if(over > 4 && pins.length){
+        box.scrollLeft = Math.max(0, Math.min(over, pins[0].x/1000 * box.scrollWidth - box.clientWidth/2));
+        STATE.scrolled = true;
+      }
+    });
+  }
+
+  host.querySelectorAll('.pin').forEach(el=>{
+    const go = ()=>selectCountry(el.dataset.cc);
+    el.addEventListener('click', go);
+    el.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
+  });
+}
+
+function renderOffMap(agg){
+  const host = document.getElementById('offMap');
+  const off = Object.entries(agg.byCountry).filter(([cc]) => !COUNTRIES[cc] || !COUNTRIES[cc].ll);
+  host.innerHTML = off.map(([cc,b]) =>
+    `<button class="chip" data-cc="${cc}">${cEmoji(cc)} ${esc(cName(cc))} <b>${b.n}</b></button>`
+  ).join('');
+  host.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>selectCountry(c.dataset.cc)));
+}
+
+function renderDetailEmpty(){
+  document.getElementById('detail').innerHTML =
+    `<div class="detail-empty">${L(
+      '👆 點地圖上的圓點，看看那個地方的人和街道是什麼關係。',
+      '👆 Tap a dot on the map to see how people there relate to their streets.',
+      '👆 地図の円をタップすると、その土地の人と街の関係が見られます。')}</div>`;
+}
+
+function selectCountry(cc){
+  const b = (STATE.agg.byCountry||{})[cc];
+  if(!b) return;
+  STATE.sel = cc;
+  document.querySelectorAll('.pin').forEach(p=>p.classList.toggle('on', p.dataset.cc===cc));
+
+  const dom = domType(b.types);
+  const thin = b.n < MIN_SAMPLE;
+  const axes = AXES.map(a=>{
+    const s = axisShare(b.axis, a);
+    if(s === null) return '';
+    const pct = Math.round(s*100);
+    return `<div class="axis-row">
+      <div class="l">${a[LANG]?a[LANG][0]:a.zh[0]}</div>
+      <div class="axis-bar"><div class="axis-fill" style="width:${pct}%"></div><div class="axis-val">${pct}% / ${100-pct}%</div></div>
+      <div class="r">${a[LANG]?a[LANG][1]:a.zh[1]}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('detail').innerHTML = `
+    <div class="d-head">
+      <div class="d-name">${cEmoji(cc)} ${esc(cName(cc))}</div>
+      <div class="d-n">${people(b.n)}</div>
+    </div>
+    ${dom ? `<div class="d-top">
+      <span class="em">${TYPES[dom[0]].e}</span>
+      <span>${L('這裡最多的是','Most common here:','いちばん多いのは')} <b>${esc(tName(dom[0]))}</b>
+      <span style="color:var(--g2)">(${Math.round(dom[1]/b.n*100)}%)</span></span>
+    </div>` : ''}
+    <div class="axes">${axes}</div>
+    ${thin ? `<div class="d-low" style="margin-top:11px">${L(
+      '樣本數還不到 '+MIN_SAMPLE+' 人，這個比例只供參考，不拿來做跨國比較。',
+      'Fewer than '+MIN_SAMPLE+' responses — treat these shares as indicative only; not used for cross-country claims.',
+      'サンプルが'+MIN_SAMPLE+'人未満です。参考値として扱い、国際比較には使いません。')}</div>` : ''}
+  `;
+}
+
+function renderInsight(agg){
+  const box = document.getElementById('insight');
+  const q = document.getElementById('insightQ');
+  const bd = document.getElementById('insightB');
+  const ins = pickInsight(agg);
+  box.style.display = 'block';
+
+  if(!ins){
+    const ready = Object.entries(agg.byCountry).filter(([cc,b]) => cc !== 'OTHER' && b.n >= INSIGHT_MIN).length;
+    q.textContent = L(
+      '資料還在累積中。',
+      'Still gathering data.',
+      'データを集めているところです。');
+    bd.innerHTML = L(
+      `要說「這個城市的人和那個城市不一樣」，得先有夠多的人。目前有 <b>${ready}</b> 個國家／地區的樣本數達到 ${INSIGHT_MIN} 人；等至少兩個地方都到門檻、而且差距通過顯著性檢定，這裡就會自動長出一句可以拿去引用的結論。<br><br>在那之前，下面的數字請當成現況紀錄，不是定論。`,
+      `Claiming that people in one city differ from another needs enough people first. <b>${ready}</b> countries/regions have reached ${INSIGHT_MIN} responses so far. Once at least two clear that bar and the gap passes a significance test, a quotable finding will appear here automatically.<br><br>Until then, read the numbers below as a snapshot, not a conclusion.`,
+      `「この街の人はあの街とちがう」と言うには、まず十分な人数が必要です。現在${INSIGHT_MIN}人に達しているのは <b>${ready}</b> の国・地域。2つ以上が基準を超え、差が有意性検定を通れば、引用できる結論がここに自動で表示されます。<br><br>それまでは、下の数字は現状の記録であって結論ではありません。`);
+    return;
+  }
+
+  const a = ins.axis;
+  const lab = a[LANG] || a.zh;
+  const hiPct = Math.round(ins.hi.s*100), loPct = Math.round(ins.lo.s*100);
+
+  q.textContent = L(
+    `在${cName(ins.hi.cc)}，${hiPct}% 的人偏向「${lab[0]}」；在${cName(ins.lo.cc)}，只有 ${loPct}%。`,
+    `In ${cNameIn(ins.hi.cc)}, ${hiPct}% lean "${lab[0]}". In ${cNameIn(ins.lo.cc)}, only ${loPct}% do.`,
+    `${cName(ins.hi.cc)}では${hiPct}%が「${lab[0]}」寄り。${cName(ins.lo.cc)}では${loPct}%だけです。`
+  );
+  bd.innerHTML = L(
+    `同一份測驗、同樣的 12 道題，換一個地方作答，答案就偏向另一邊。這不是因為人不一樣，而是因為<b>街道不一樣</b> — 一條敢讓人慢下來的街，才會養出慢下來的人。<br><br><span style="opacity:.75;font-size:12px">樣本：${cName(ins.hi.cc)} ${ins.hi.n} 人、${cName(ins.lo.cc)} ${ins.lo.n} 人。兩比例 z = ${ins.z.toFixed(2)}（雙尾 p &lt; .05）。這句話由資料自動產生，只採用樣本數 ${INSIGHT_MIN} 人以上的地區，會隨參與者增加而改變。</span>`,
+    `Same quiz, same 12 questions — answered somewhere else, the answers tilt the other way. Not because the people differ, but because <b>the streets do</b>. A street that lets you slow down is what grows people who do.<br><br><span style="opacity:.75;font-size:12px">Samples: ${cName(ins.hi.cc)} n=${ins.hi.n}, ${cName(ins.lo.cc)} n=${ins.lo.n}. Two-proportion z = ${ins.z.toFixed(2)} (two-tailed p &lt; .05). Generated from the data, using only places with ${INSIGHT_MIN}+ responses; it shifts as more people take part.</span>`,
+    `同じ診断、同じ12問。でも場所が変わると、答えは反対側にかたむきます。人がちがうからではなく、<b>街がちがう</b>から。ゆっくり歩ける道が、ゆっくり歩く人を育てます。<br><br><span style="opacity:.75;font-size:12px">サンプル：${cName(ins.hi.cc)} ${ins.hi.n}人、${cName(ins.lo.cc)} ${ins.lo.n}人。2標本比率の z = ${ins.z.toFixed(2)}（両側 p &lt; .05）。${INSIGHT_MIN}人以上の地域のみを用いてデータから自動生成され、参加者が増えると変わります。</span>`
+  );
+}
+
+function renderCountryCards(agg){
+  const host = document.getElementById('cGrid');
+  const entries = Object.entries(agg.byCountry).sort((a,b)=>b[1].n - a[1].n);
+  const enough = entries.filter(([cc,b]) => b.n >= MIN_SAMPLE && cc !== 'OTHER').length;
+
+  document.getElementById('cGridSub').textContent = L(
+    `目前有 ${entries.length} 個國家／地區留下資料，其中 ${enough} 個樣本數達到 ${MIN_SAMPLE} 人以上、可以拿來比較。淡色的卡片樣本還太少。`,
+    `${entries.length} countries/regions have data; ${enough} have reached ${MIN_SAMPLE}+ responses and can be compared. Faded cards are still too small a sample.`,
+    `現在${entries.length}の国・地域にデータがあり、うち${enough}が${MIN_SAMPLE}人以上で比較可能です。薄いカードはまだサンプルが少ないものです。`
+  );
+
+  host.innerHTML = entries.map(([cc,b])=>{
+    const thin = b.n < MIN_SAMPLE;
+    const dom = domType(b.types);
+    return `<div class="c-card ${thin?'thin':''}">
+      <div class="c-top">
+        <div class="c-name">${cEmoji(cc)} ${esc(cName(cc))}</div>
+        <div class="c-n">${people(b.n)}</div>
+      </div>
+      ${thin
+        ? `<div class="c-thin-note">${L('樣本數未達 '+MIN_SAMPLE+' 人，先不下結論。','Under '+MIN_SAMPLE+' responses — no conclusions yet.',MIN_SAMPLE+'人未満のため、まだ結論は出しません。')}</div>`
+        : `<div class="c-dom">
+            <span class="em">${dom?TYPES[dom[0]].e:'·'}</span>
+            <span class="tx"><b>${dom?esc(tName(dom[0])):'—'}</b>
+            <span>${L('最多','most common','いちばん多い')} · ${dom?Math.round(dom[1]/b.n*100):0}%</span></span>
+          </div>
+          <div class="axes">${AXES.map(a=>{
+            const s = axisShare(b.axis,a); if(s===null) return '';
+            const lab = a[LANG]||a.zh, pct = Math.round(s*100);
+            return `<div class="axis-row"><div class="l">${lab[0]}</div>
+              <div class="axis-bar"><div class="axis-fill" style="width:${pct}%"></div><div class="axis-val">${pct}%</div></div>
+              <div class="r">${lab[1]}</div></div>`;
+          }).join('')}</div>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function renderTaiwan(agg){
+  const host = document.getElementById('twList');
+  const e = Object.entries(agg.byCity).sort((a,b)=>b[1]-a[1]);
+  if(!e.length){
+    document.getElementById('twCard').style.display = 'none';
+    return;
+  }
+  document.getElementById('twCard').style.display = '';
+  const max = e[0][1], total = e.reduce((s,[,n])=>s+n,0);
+  host.innerHTML = e.map(([city,n])=>`
+    <div class="rank-row">
+      <div>
+        <div class="rank-lab"><span class="em">📍</span><span class="nm">${esc(LANG === 'en' ? (TW_CITY_EN[city] || city) : city)}</span></div>
+        <div class="rank-track"><div class="rank-fill" style="width:${(n/max*100).toFixed(1)}%"></div></div>
+      </div>
+      <div class="rank-num"><b>${n}</b> · ${(n/total*100).toFixed(1)}%</div>
+    </div>`).join('');
+}
+
+function renderTypes(agg){
+  const host = document.getElementById('typeList');
+  const e = Object.keys(TYPES).map(c=>[c, agg.byType[c]||0]).sort((a,b)=>b[1]-a[1]);
+  const max = Math.max(...e.map(x=>x[1]), 1);
+  host.innerHTML = e.map(([code,n])=>`
+    <div class="rank-row">
+      <div>
+        <div class="rank-lab"><span class="em">${TYPES[code].e}</span><span class="nm">${esc(tName(code))}</span></div>
+        <div class="rank-track"><div class="rank-fill" style="width:${(n/max*100).toFixed(1)}%"></div></div>
+      </div>
+      <div class="rank-num"><b>${n}</b> · ${(n/agg.total*100).toFixed(1)}%</div>
+    </div>`).join('');
+}
+
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ---------- states ---------- */
+function show(which){
+  ['loading','setup','failed','empty','content'].forEach(id=>{
+    document.getElementById(id).style.display = (id===which) ? 'block' : 'none';
+  });
+}
+
+/* ---------- demo data (opt-in via ?demo=1, always labelled) ---------- */
+function demoRows(){
+  // Deterministic pseudo-random so the preview is stable between reloads.
+  let seed = 20260918;
+  const rnd = ()=> (seed = (seed*1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  const pick = (opts)=>{
+    const r = rnd(); let acc = 0;
+    for(const [k,w] of opts){ acc += w; if(r <= acc) return k; }
+    return opts[opts.length-1][0];
+  };
+  // country -> [n, P(M), P(E), P(C), P(Y)]
+  const profile = {
+    TW:[520,.38,.42,.46,.58], JP:[120,.52,.44,.38,.55], NL:[46,.71,.49,.44,.62],
+    DE:[38,.63,.47,.41,.60], KR:[34,.41,.40,.43,.52], US:[52,.44,.55,.40,.49],
+    HK:[22,.40,.38,.42,.50], SG:[18,.45,.41,.45,.53], MY:[12,.43,.46,.49,.47],
+    CN:[9,.42,.43,.47,.51], UK:[16,.58,.50,.42,.57], FR:[11,.61,.52,.45,.59],
+    CA:[8,.55,.53,.43,.54], AU:[6,.50,.51,.44,.52], OTHER:[7,.50,.50,.45,.52]
+  };
+  const twCities = ['台北市','新北市','台中市','高雄市','台南市','桃園市','新竹市','基隆市','宜蘭縣','彰化縣'];
+  const rows = [];
+  const now = Date.now();
+  Object.entries(profile).forEach(([cc,[n,pM,pE,pC,pY]])=>{
+    for(let i=0;i<n;i++){
+      const code = (rnd()<pM?'M':'R') + (rnd()<pE?'E':'H') + (rnd()<pC?'C':'S') + (rnd()<pY?'Y':'I');
+      rows.push({
+        timestamp: new Date(now - Math.floor(rnd()*86400000*21)).toISOString(),
+        type_code: code,
+        country: cc,
+        city: cc==='TW' ? pick(twCities.map((c,ix)=>[c, ix<3?0.22:0.08])) : '',
+        language: cc==='TW'?'zh':cc==='JP'?'ja':'en'
+      });
+    }
+  });
+  return rows;
+}
+
+/* ---------- boot ---------- */
+function banner(html, soft){
+  document.getElementById('banner').innerHTML = html ? `<div class="banner ${soft?'soft':''}">${html}</div>` : '';
+}
+
+async function load(){
+  if(STATE.demo){
+    STATE.rows = demoRows();
+    banner(L(
+      '⚠️ 示範資料 · 這一頁目前顯示的是<u>編造的假資料</u>，只是為了預覽版面。網址拿掉 <code>?demo=1</code> 就會讀真實資料。',
+      '⚠️ DEMO DATA · This page is showing <u>made-up numbers</u> for layout preview only. Drop <code>?demo=1</code> from the URL for real data.',
+      '⚠️ デモデータ · このページは<u>架空の数値</u>を表示しています（レイアウト確認用）。URLから <code>?demo=1</code> を外すと実データになります。'));
+    render(STATE.rows);
+    return;
+  }
+
+  if(!CSV_URL || CSV_URL.includes('PASTE_YOUR')){
+    show('setup');
+    document.getElementById('setupMsg').innerHTML = L(
+      '請在 <code>config.js</code> 裡填入 <code>SHEET_CSV_URL</code>：打開 Google 試算表 → 檔案 → 共用 → 發布到網路 → 選逗號分隔值 (.csv) → 發布，然後把網址貼進去。<br><br>想先看看版面長什麼樣子？<a href="?demo=1">用示範資料預覽 →</a>',
+      'Set <code>SHEET_CSV_URL</code> in <code>config.js</code>: open the Google Sheet → File → Share → Publish to web → comma-separated values (.csv) → Publish, then paste the URL.<br><br>Want to see the layout first? <a href="?demo=1">Preview with demo data →</a>',
+      '<code>config.js</code> の <code>SHEET_CSV_URL</code> を設定してください：スプレッドシート → ファイル → 共有 → ウェブに公開 → カンマ区切り値 (.csv) → 公開 で得られるURLを貼り付けます。<br><br>先にレイアウトを見たい場合は <a href="?demo=1">デモデータで表示 →</a>');
+    return;
+  }
+
+  try{
+    const sep = CSV_URL.includes('?') ? '&' : '?';
+    const res = await fetch(CSV_URL + sep + 'cb=' + Date.now());
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    STATE.rows = parseCSV(await res.text());
+    banner('');
+    render(STATE.rows);
+  }catch(err){
+    console.error(err);
+    show('failed');
+    document.getElementById('failedMsg').innerHTML = L(
+      '請確認 <code>config.js</code> 的 <code>SHEET_CSV_URL</code> 正確，而且試算表已「發布到網路」（不只是共用連結）。<br><span style="color:var(--g2);font-size:12px">'+esc(err.message)+'</span>',
+      'Check that <code>SHEET_CSV_URL</code> in <code>config.js</code> is correct and that the sheet is <em>published to the web</em> (not just link-shared).<br><span style="color:var(--g2);font-size:12px">'+esc(err.message)+'</span>',
+      '<code>config.js</code> の <code>SHEET_CSV_URL</code> が正しいか、シートが「ウェブに公開」されているか確認してください（共有リンクだけでは不可）。<br><span style="color:var(--g2);font-size:12px">'+esc(err.message)+'</span>');
+  }
+}
+
+/* init */
+(function init(){
+  const qs = new URLSearchParams(location.search);
+  STATE.demo = qs.has('demo');
+  let lang = qs.get('lang');
+  if(!lang){ try{ lang = localStorage.getItem('ssq-lang'); }catch(e){} }
+  if(!lang){
+    const n = (navigator.language||'').toLowerCase();
+    lang = n.startsWith('ja') ? 'ja' : n.startsWith('zh') ? 'zh' : 'en';
+  }
+  setLang(lang, false);
+  document.querySelectorAll('.lang-btn').forEach(b=>
+    b.addEventListener('click', ()=>setLang(b.dataset.lang, true)));
+  renderDetailEmpty();
+  load();
+  setInterval(load, 60000);
+})();
+</script>
+</body>
+</html>
