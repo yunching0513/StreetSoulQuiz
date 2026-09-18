@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>世界牆審核 · Street Soul moderation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lime:#C8D400; --lime-dk:#A8B200; --lime-soft:#E8EE8C; --coral:#FF6B5B;
+  --cream:#FBF7EC; --paper:#FFFCF2; --black:#1A1A1A;
+  --g1:#4A4A4A; --g2:#8a8a8a; --g3:#D0D0D0; --g4:#F0F0EC; --white:#fff;
+  --zh:'Noto Sans TC',sans-serif; --en:'Space Grotesk',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--zh);background:var(--cream);color:var(--black);-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:26px 20px 70px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.tag{display:inline-flex;align-items:center;gap:8px;background:var(--black);color:var(--lime);font-family:var(--en);font-size:10px;font-weight:700;letter-spacing:.2em;padding:6px 13px;border-radius:100px;margin-bottom:12px}
+h1{font-size:27px;letter-spacing:-.01em}
+.sub{font-size:13px;color:var(--g1);margin-top:7px;line-height:1.7}
+.btn{border:1.5px solid var(--black);background:var(--white);border-radius:100px;padding:8px 15px;font-family:var(--zh);font-size:13px;cursor:pointer;transition:.18s}
+.btn:hover{background:var(--lime-soft)}
+.btn.dark{background:var(--black);color:var(--lime)}
+.btn.danger:hover{background:var(--coral);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.card{background:var(--white);border:1.5px solid var(--black);border-radius:18px;padding:20px;margin-bottom:15px}
+.card h2{font-size:17px;margin-bottom:5px}
+.card .hint{font-size:12.5px;color:var(--g1);line-height:1.75;margin-bottom:15px}
+label.f{display:block;font-size:12.5px;font-weight:700;margin-bottom:6px}
+input.f{width:100%;border:1.5px solid var(--black);border-radius:11px;padding:11px 13px;font-family:var(--zh);font-size:14.5px;background:var(--paper);margin-bottom:12px;outline:none}
+input.f:focus{box-shadow:0 0 0 3px var(--lime-soft)}
+.err{border:1.5px solid var(--coral);background:#FFF1EF;border-radius:11px;padding:11px 13px;font-size:12.5px;line-height:1.7;color:#8a2a1e;margin-bottom:12px}
+.ok{border:1.5px solid var(--lime-dk);background:#F7FADF;border-radius:11px;padding:11px 13px;font-size:12.5px;line-height:1.7;margin-bottom:12px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.tab{border:1.5px solid var(--black);background:var(--white);border-radius:100px;padding:7px 14px;font-size:12.5px;cursor:pointer}
+.tab.on{background:var(--black);color:var(--lime);font-weight:700}
+.count{margin-left:auto;font-family:var(--en);font-size:11.5px;color:var(--g2)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-family:var(--en);font-size:9.5px;letter-spacing:.14em;color:var(--g2);padding:0 8px 9px;border-bottom:1.5px solid var(--g3);white-space:nowrap}
+td{padding:11px 8px;border-bottom:1px solid var(--g4);vertical-align:middle}
+tr.hidden-row{background:#FFF6F4}
+tr.hidden-row td{color:var(--g1)}
+.who{display:flex;align-items:center;gap:9px}
+.who .em{font-size:20px}
+.who b{font-size:13.5px}
+.who .anon{font-weight:400;color:var(--g2);font-style:italic}
+.pill{display:inline-block;font-family:var(--en);font-size:10px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:100px;border:1.2px solid var(--black)}
+.pill.vis{background:var(--lime-soft)}
+.pill.hid{background:var(--coral);color:#fff;border-color:var(--coral)}
+.pill.flag{background:#FFE9A8}
+.pill.scrub{background:var(--g4);color:var(--g1);border-color:var(--g3)}
+.acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.acts .btn{padding:6px 11px;font-size:12px}
+.terms{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.term{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--black);border-radius:100px;padding:5px 7px 5px 13px;font-size:12.5px;background:var(--paper);font-family:var(--mono)}
+.term button{border:none;background:transparent;cursor:pointer;font-size:14px;color:var(--g2);padding:0 4px;line-height:1}
+.term button:hover{color:var(--coral)}
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.row input.f{flex:1;min-width:180px;margin-bottom:0}
+.empty{padding:26px;text-align:center;color:var(--g2);font-size:13px}
+.foot{margin-top:24px;font-size:11.5px;color:var(--g2);line-height:1.9;border-top:1.5px solid var(--g3);padding-top:18px}
+.foot code{font-family:var(--mono);background:var(--g4);padding:2px 6px;border-radius:5px;font-size:11px}
+@media (max-width:640px){
+  th:nth-child(2),td:nth-child(2){display:none}
+  .acts{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div>
+      <div class="tag">MODERATION · 世界牆審核</div>
+      <h1>世界牆審核台</h1>
+      <div class="sub">
+        牆是「先顯示、後審核」：送出即上牆，這裡處理的是被回報、被自動下架、或名字被過濾掉的那些。<br>
+        被回報 3 次會自動下架，等你在這裡複查後再決定要不要放回去。
+      </div>
+    </div>
+    <button class="btn" id="logout" style="display:none">登出</button>
+  </div>
+
+  <!-- 尚未設定 -->
+  <div class="card" id="unconfigured" style="display:none">
+    <h2>還沒接上 Supabase</h2>
+    <div class="hint">
+      請先在 <code>config.js</code> 填入 <code>SUPABASE_URL</code> 與 <code>SUPABASE_ANON_KEY</code>
+      （Supabase 專案 → Settings → API）。<br>
+      只能填 anon / publishable key，service_role key 絕對不要放進去。
+    </div>
+  </div>
+
+  <!-- 登入 -->
+  <div class="card" id="loginCard" style="display:none">
+    <h2>登入</h2>
+    <div class="hint">
+      用 Supabase Auth 的帳號登入。帳號要另外被加進 <code>moderators</code> 表才有權限，
+      光是登入不會自動變成管理員。
+    </div>
+    <div id="loginMsg"></div>
+    <label class="f" for="mEmail">Email</label>
+    <input class="f" type="email" id="mEmail" autocomplete="username">
+    <label class="f" for="mPass">密碼</label>
+    <input class="f" type="password" id="mPass" autocomplete="current-password">
+    <button class="btn dark" id="loginBtn" style="width:100%;border-radius:12px;padding:13px">登入</button>
+  </div>
+
+  <!-- 主畫面 -->
+  <div id="app" style="display:none">
+
+    <div class="card">
+      <h2>打卡列表</h2>
+      <div class="hint">「需要處理」= 被回報過、已被下架、或名字被自動過濾掉的。日常只看這一欄就夠。</div>
+      <div class="tabs">
+        <button class="tab on" data-f="flagged">需要處理</button>
+        <button class="tab" data-f="all">全部</button>
+        <button class="btn" id="refresh">↻ 重新整理</button>
+        <span class="count" id="feedCount"></span>
+      </div>
+      <div id="feedMsg"></div>
+      <div id="feedWrap"></div>
+    </div>
+
+    <div class="card">
+      <h2>暱稱封鎖字</h2>
+      <div class="hint">
+        命中的暱稱會被清成空白，那筆打卡照樣留在牆上，只是不顯示名字 — 刻意不給使用者錯誤訊息，
+        免得變成「怎麼規避」的教學。比對前會先轉小寫並去掉空白與標點，所以 <code>a.d.m.i.n</code> 這種寫法也擋得到。<br>
+        清單預設是空的：請依實際遇到的狀況自己補，不要預先把髒話清單寫進公開的 repo。
+      </div>
+      <div id="termMsg"></div>
+      <div class="terms" id="termList"></div>
+      <div class="row">
+        <input class="f" id="newTerm" placeholder="要封鎖的字串" maxlength="40">
+        <input class="f" id="newNote" placeholder="備註（選填）" maxlength="80">
+        <button class="btn dark" id="addTerm">新增</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    第一次設定：Supabase → Authentication → Users → Add user 建一個帳號，
+    然後到 SQL Editor 執行
+    <code>insert into public.moderators (user_id) values ('&lt;那個帳號的 uid&gt;');</code><br>
+    這一頁只有審核功能，不會顯示 IP、email 或任何統計以外的個人資料 — 因為資料庫裡本來就沒有存。
+  </div>
+</div>
+
+<script src="config.js" onerror="window.SSQ_CONFIG=window.SSQ_CONFIG||{}"></script>
+<script src="supa.js" onerror="window.SSQ=null"></script>
+<script>
+/* ============================================================
+   世界牆審核台
+   權限不是靠這個頁面，是靠資料庫：所有動作都走 security definer
+   的 RPC，函式裡會檢查 moderators 表。這頁只是個方便的殼。
+   ============================================================ */
+const TYPES = {
+  MECY:{e:'🦉',zh:'城市觀察家'}, MECI:{e:'🐱',zh:'街角分享家'}, MESY:{e:'🐢',zh:'漫遊思考者'},
+  MESI:{e:'🦋',zh:'散步詩人'}, MHCY:{e:'🐶',zh:'鄰里大使'},   MHCI:{e:'🐰',zh:'早市好朋友'},
+  MHSY:{e:'🐼',zh:'街道守護者'}, MHSI:{e:'🦔',zh:'黃昏散步家'}, RECY:{e:'🦊',zh:'通勤革新者'},
+  RECI:{e:'🐬',zh:'城市衝浪者'}, RESY:{e:'🦅',zh:'路線設計師'}, RESI:{e:'🐎',zh:'自由騎士'},
+  RHCY:{e:'🐘',zh:'大眾運輸推手'}, RHCI:{e:'🐝',zh:'通勤好夥伴'}, RHSY:{e:'🐜',zh:'高效規劃師'},
+  RHSI:{e:'🦝',zh:'通勤忍者'}
+};
+const PLACES = {
+  TW:'🇹🇼 台灣', JP:'🇯🇵 日本', KR:'🇰🇷 韓國', HK:'🇭🇰 香港', SG:'🇸🇬 新加坡',
+  MY:'🇲🇾 馬來西亞', CN:'🇨🇳 中國', US:'🇺🇸 美國', CA:'🇨🇦 加拿大', UK:'🇬🇧 英國',
+  DE:'🇩🇪 德國', FR:'🇫🇷 法國', NL:'🇳🇱 荷蘭', AU:'🇦🇺 澳洲', OTHER:'🌍 其他'
+};
+const TOKEN_KEY = 'ssq-mod-token';
+let TOKEN = null;
+let FILTER = 'flagged';
+
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function msg(id, html, kind){
+  const el = document.getElementById(id);
+  el.innerHTML = html ? '<div class="' + (kind || 'err') + '">' + html + '</div>' : '';
+}
+function relTime(iso){
+  const ts = Date.parse(iso);
+  if(isNaN(ts)) return '';
+  const m = Math.floor((Date.now()-ts)/60000);
+  if(m < 60) return m + ' 分前';
+  const h = Math.floor(m/60);
+  if(h < 24) return h + ' 小時前';
+  return Math.floor(h/24) + ' 天前';
+}
+function place(r){
+  if(r.country === 'TW' && r.city) return '🇹🇼 ' + esc(r.city);
+  return PLACES[r.country] || (r.country ? esc(r.country) : '—');
+}
+
+/* ---------- 登入 ---------- */
+async function doLogin(){
+  const btn = document.getElementById('loginBtn');
+  const email = document.getElementById('mEmail').value.trim();
+  const pass  = document.getElementById('mPass').value;
+  if(!email || !pass) return;
+  btn.disabled = true; btn.textContent = '登入中…';
+  msg('loginMsg', '');
+  try{
+    const r = await SSQ.signIn(email, pass);
+    TOKEN = r.access_token;
+    const isMod = await SSQ.rpc('is_moderator', {}, TOKEN);
+    if(!isMod){
+      TOKEN = null;
+      msg('loginMsg', '這個帳號登入成功，但還不是管理員。請在 Supabase 的 SQL Editor 執行：<br>' +
+        '<code>insert into public.moderators (user_id) values (\'' + esc(r.user.id) + '\');</code>');
+      btn.disabled = false; btn.textContent = '登入';
+      return;
+    }
+    try{ sessionStorage.setItem(TOKEN_KEY, TOKEN); }catch(e){}
+    enterApp();
+  }catch(err){
+    msg('loginMsg', '登入失敗：' + esc(err.message));
+    btn.disabled = false; btn.textContent = '登入';
+  }
+}
+
+function enterApp(){
+  document.getElementById('loginCard').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('logout').style.display = '';
+  loadFeed();
+  loadTerms();
+}
+
+function doLogout(){
+  TOKEN = null;
+  try{ sessionStorage.removeItem(TOKEN_KEY); }catch(e){}
+  location.reload();
+}
+
+/* ---------- 列表 ---------- */
+async function loadFeed(){
+  msg('feedMsg', '');
+  const wrap = document.getElementById('feedWrap');
+  wrap.innerHTML = '<div class="empty">讀取中…</div>';
+  try{
+    const rows = await SSQ.rpc('moderation_feed',
+      {p_limit: 300, p_only_flagged: FILTER === 'flagged'}, TOKEN) || [];
+    document.getElementById('feedCount').textContent = rows.length + ' 筆';
+    if(!rows.length){
+      wrap.innerHTML = '<div class="empty">' +
+        (FILTER === 'flagged' ? '沒有需要處理的，很好。' : '牆上還沒有任何打卡。') + '</div>';
+      return;
+    }
+    wrap.innerHTML =
+      '<table><thead><tr><th>誰</th><th>地點</th><th>狀態</th><th>時間</th><th></th></tr></thead><tbody>' +
+      rows.map(r=>{
+        const t = TYPES[r.type_code] || {e:'·', zh:r.type_code};
+        const named = !!(r.nickname && r.nickname.trim());
+        const pills =
+          (r.status === 'hidden' ? '<span class="pill hid">已下架</span> ' : '<span class="pill vis">在牆上</span> ') +
+          (r.reports > 0 ? '<span class="pill flag">回報 ' + r.reports + '</span> ' : '') +
+          (r.nickname_scrubbed ? '<span class="pill scrub">名字被過濾</span>' : '');
+        return '<tr class="' + (r.status === 'hidden' ? 'hidden-row' : '') + '" data-id="' + r.id + '">' +
+          '<td><div class="who"><span class="em">' + t.e + '</span><div>' +
+            (named ? '<b>' + esc(r.nickname) + '</b>' : '<span class="anon">（沒有名字）</span>') +
+            '<div style="font-size:11.5px;color:var(--g2)">' + esc(t.zh) + '</div></div></div></td>' +
+          '<td>' + place(r) + '</td>' +
+          '<td>' + pills + '</td>' +
+          '<td style="white-space:nowrap;color:var(--g2);font-size:12px">' + relTime(r.created_at) + '</td>' +
+          '<td><div class="acts">' +
+            (r.status === 'hidden'
+              ? '<button class="btn" data-act="show" data-id="' + r.id + '">放回牆上</button>'
+              : '<button class="btn danger" data-act="hide" data-id="' + r.id + '">下架</button>') +
+            (named ? '<button class="btn" data-act="clear" data-id="' + r.id + '">清掉名字</button>' : '') +
+          '</div></td></tr>';
+      }).join('') + '</tbody></table>';
+
+    wrap.querySelectorAll('[data-act]').forEach(b=>
+      b.addEventListener('click', ()=>act(b.getAttribute('data-act'), b.getAttribute('data-id'), b)));
+  }catch(err){
+    wrap.innerHTML = '';
+    msg('feedMsg', '讀取失敗：' + esc(err.message));
+  }
+}
+
+async function act(kind, id, btn){
+  if(kind === 'clear' && !confirm('把這筆的名字清掉？打卡本身會留在牆上。')) return;
+  btn.disabled = true;
+  try{
+    if(kind === 'hide')  await SSQ.rpc('set_soul_status', {p_id:id, p_status:'hidden'},  TOKEN);
+    if(kind === 'show')  await SSQ.rpc('set_soul_status', {p_id:id, p_status:'visible'}, TOKEN);
+    if(kind === 'clear') await SSQ.rpc('clear_nickname',  {p_id:id}, TOKEN);
+    await loadFeed();
+  }catch(err){
+    btn.disabled = false;
+    msg('feedMsg', '操作失敗：' + esc(err.message));
+  }
+}
+
+/* ---------- 封鎖字 ---------- */
+async function loadTerms(){
+  msg('termMsg','');
+  const el = document.getElementById('termList');
+  try{
+    const rows = await SSQ.rpc('list_blocked_terms', {}, TOKEN) || [];
+    el.innerHTML = rows.length
+      ? rows.map(t=>'<span class="term" title="' + esc(t.note||'') + '">' + esc(t.term) +
+          '<button data-term="' + esc(t.term) + '" aria-label="移除">×</button></span>').join('')
+      : '<span style="font-size:12.5px;color:var(--g2)">目前沒有封鎖字。</span>';
+    el.querySelectorAll('[data-term]').forEach(b=>
+      b.addEventListener('click', ()=>removeTerm(b.getAttribute('data-term'))));
+  }catch(err){
+    msg('termMsg','讀取失敗：' + esc(err.message));
+  }
+}
+async function addTerm(){
+  const t = document.getElementById('newTerm');
+  const n = document.getElementById('newNote');
+  if(!t.value.trim()) return;
+  const btn = document.getElementById('addTerm');
+  btn.disabled = true;
+  try{
+    await SSQ.rpc('add_blocked_term', {p_term: t.value.trim(), p_note: n.value.trim() || null}, TOKEN);
+    t.value = ''; n.value = '';
+    await loadTerms();
+  }catch(err){ msg('termMsg','新增失敗：' + esc(err.message)); }
+  finally{ btn.disabled = false; }
+}
+async function removeTerm(term){
+  try{
+    await SSQ.rpc('remove_blocked_term', {p_term: term}, TOKEN);
+    await loadTerms();
+  }catch(err){ msg('termMsg','移除失敗：' + esc(err.message)); }
+}
+
+/* ---------- init ---------- */
+(function init(){
+  if(!window.SSQ || !SSQ.ready){
+    document.getElementById('unconfigured').style.display = 'block';
+    return;
+  }
+  document.getElementById('loginBtn').addEventListener('click', doLogin);
+  document.getElementById('mPass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  document.getElementById('logout').addEventListener('click', doLogout);
+  document.getElementById('refresh').addEventListener('click', loadFeed);
+  document.getElementById('addTerm').addEventListener('click', addTerm);
+  document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click', ()=>{
+    FILTER = b.getAttribute('data-f');
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x===b));
+    loadFeed();
+  }));
+
+  let saved = null;
+  try{ saved = sessionStorage.getItem(TOKEN_KEY); }catch(e){}
+  if(saved){
+    TOKEN = saved;
+    SSQ.rpc('is_moderator', {}, TOKEN)
+      .then(ok => ok ? enterApp() : (TOKEN = null, document.getElementById('loginCard').style.display='block'))
+      .catch(()=>{ TOKEN = null; document.getElementById('loginCard').style.display='block'; });
+  } else {
+    document.getElementById('loginCard').style.display = 'block';
+  }
+})();
+</script>
+</body>
+</html>

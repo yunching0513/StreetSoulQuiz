@@ -171,6 +171,36 @@ h1{font-family:var(--serif);font-size:clamp(30px,5.4vw,52px);line-height:1.1;let
 .footer strong{color:var(--black)}
 .footer a{color:var(--g1)}
 
+/* WALL · 世界牆 */
+.wall-card{padding:22px 22px 24px}
+.wall-tools{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.wall-tab{border:1.5px solid var(--black);background:var(--white);border-radius:100px;padding:7px 15px;font-family:var(--zh);font-size:12.5px;font-weight:500;cursor:pointer;transition:.18s}
+.wall-tab:hover{background:var(--lime-soft)}
+.wall-tab.on{background:var(--black);color:var(--lime);font-weight:700}
+.wall-count{margin-left:auto;font-family:var(--en);font-size:11.5px;color:var(--g2)}
+.wall-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:11px}
+.w-item{position:relative;border:1.5px solid var(--black);border-radius:15px;padding:13px 14px;background:var(--paper);display:flex;gap:11px;align-items:flex-start;transition:.18s}
+.w-item.fresh{animation:wpop .5s cubic-bezier(.16,1,.3,1)}
+@keyframes wpop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.w-item.done{opacity:.5}
+.w-em{font-size:25px;line-height:1.1;flex-shrink:0}
+.w-body{min-width:0;flex:1}
+.w-name{font-size:14.5px;font-weight:700;word-break:break-word;line-height:1.35}
+.w-name.anon{font-weight:400;color:var(--g1)}
+.w-meta{font-size:11.5px;color:var(--g2);line-height:1.6;margin-top:3px}
+.w-flag{position:absolute;top:8px;right:9px;border:none;background:transparent;font-size:12px;color:var(--g3);cursor:pointer;padding:3px 5px;border-radius:7px;opacity:0;transition:.18s}
+.w-item:hover .w-flag,.w-item:focus-within .w-flag{opacity:1}
+.w-flag:hover{color:var(--coral);background:var(--g4)}
+.w-reported{font-size:11.5px;color:var(--g2);font-style:italic;margin-top:5px}
+.wall-more{display:block;width:100%;margin-top:14px;border:1.5px solid var(--black);background:var(--white);border-radius:14px;padding:13px;font-family:var(--zh);font-size:14px;cursor:pointer;transition:.2s}
+.wall-more:hover{background:var(--lime)}
+.wall-more:disabled{opacity:.5;cursor:default}
+.wall-empty{border:1.5px dashed var(--black);border-radius:15px;padding:30px 22px;text-align:center;font-size:13.5px;color:var(--g1);line-height:1.8;background:var(--paper)}
+.wall-empty a{color:var(--black)}
+.wall-note{font-size:11.5px;color:var(--g2);line-height:1.75;margin-top:14px}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);background:var(--black);color:var(--paper);padding:12px 20px;border-radius:100px;font-size:13.5px;z-index:99;opacity:0;pointer-events:none;transition:.25s;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
 /* 手機上把地圖改成可橫向捲動，維持標籤可讀 */
 .map-hint{display:none;font-size:11.5px;color:var(--g2);text-align:center;margin-top:8px}
 @media (max-width:640px){
@@ -311,6 +341,32 @@ h1{font-family:var(--serif);font-size:clamp(30px,5.4vw,52px);line-height:1.1;let
       <div class="detail" id="detail"></div>
     </div>
 
+
+    <!-- WALL -->
+    <div class="card wall-card" id="wall" style="display:none">
+      <div class="card-label">THE WALL · <span class="zh-only">世界牆</span><span class="en-only">THE WALL</span><span class="ja-only">世界ウォール</span></div>
+      <h2 class="card-title zh-only">願意讓大家看見的人</h2>
+      <h2 class="card-title en-only">The people who chose to be seen</h2>
+      <h2 class="card-title ja-only">姿を見せてくれた人たち</h2>
+      <p class="card-sub zh-only">這些是做完測驗、而且主動勾選公開的人。沒有帳號、沒有追蹤、不能留言：只是讓你知道，還有誰在這條路上。</p>
+      <p class="card-sub en-only">People who finished the quiz and chose to be public. No accounts, no following, no comments — just so you know who else is out here.</p>
+      <p class="card-sub ja-only">診断を終えて、公開を選んだ人たちです。アカウントもフォローもコメントもありません。ただ、ほかに誰がいるかを知るために。</p>
+
+      <div class="wall-tools">
+        <button class="wall-tab on" data-wt="all"><span class="zh-only">全部</span><span class="en-only">Everyone</span><span class="ja-only">すべて</span></button>
+        <button class="wall-tab" data-wt="mine" id="wallMineTab" style="display:none"></button>
+        <span class="wall-count" id="wallCount"></span>
+      </div>
+
+      <div class="wall-grid" id="wallGrid"></div>
+      <div id="wallEmpty"></div>
+      <button class="wall-more" id="wallMore" style="display:none"></button>
+
+      <div class="wall-note zh-only">看到不妥的內容請按卡片右上角的 ⚑ 回報，累積到門檻會自動下架，再由人工複查。每個人都可以隨時撤掉自己的那一列。</div>
+      <div class="wall-note en-only">Flag anything inappropriate with the ⚑ on a card. Enough flags auto-hide it pending human review. Everyone can take down their own row at any time.</div>
+      <div class="wall-note ja-only">不適切なものはカード右上の ⚑ で報告してください。一定数で自動的に非表示になり、その後に人が確認します。自分の行はいつでも取り下げられます。</div>
+    </div>
+
     <!-- INSIGHT -->
     <div class="insight" id="insight" style="display:none">
       <div class="il">THE POINT · <span class="zh-only">這張圖在說什麼</span><span class="en-only">WHAT THE MAP SAYS</span><span class="ja-only">この地図が語ること</span></div>
@@ -383,7 +439,10 @@ h1{font-family:var(--serif);font-size:clamp(30px,5.4vw,52px);line-height:1.1;let
 
 </div>
 
+<div id="toast" role="status" aria-live="polite"></div>
+
 <script src="config.js" onerror="window.SSQ_CONFIG=window.SSQ_CONFIG||{}"></script>
+<script src="supa.js" onerror="window.SSQ=null"></script>
 <script>
 /* ============================================================
    世界街道靈魂地圖 · World Street Soul Map
@@ -478,6 +537,7 @@ function setLang(lang, persist){
   if(cta) cta.href = 'index.html'+q;
   if(persist){ try{ localStorage.setItem('ssq-lang', LANG); }catch(e){} }
   if(STATE.rows) render(STATE.rows);
+  if(WALL.items.length || WALL.myType){ wallRender(); wallUpdateCount(); }
 }
 
 /* ---------- projection (equirectangular, matches the inline basemap) ---------- */
@@ -925,6 +985,195 @@ function demoRows(){
   return rows;
 }
 
+
+/* ============================================================
+   THE WALL · 世界牆
+   ------------------------------------------------------------
+   牆的資料在 Supabase（souls 表），和上面的地圖／統計是兩套來源：
+   地圖是全體的匿名彙總（Google Sheet），牆只有主動勾選公開的人。
+   沒設定 Supabase 的話整塊不顯示，頁面其他部分照常。
+   ============================================================ */
+const WALL = {items: [], filter: 'all', myType: null, exhausted: false, busy: false, reported: {}};
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function wallRelTime(iso){
+  const ts = Date.parse(iso);
+  if(isNaN(ts)) return '';
+  const m = Math.floor((Date.now()-ts)/60000);
+  if(m < 1)  return L('剛剛','just now','たった今');
+  if(m < 60) return L(m+' 分鐘前', m+' min ago', m+'分前');
+  const h = Math.floor(m/60);
+  if(h < 24) return L(h+' 小時前', h+' h ago', h+'時間前');
+  const d = Math.floor(h/24);
+  if(d < 30) return L(d+' 天前', d+' days ago', d+'日前');
+  return new Date(ts).toLocaleDateString(LANG==='ja'?'ja-JP':LANG==='en'?'en-US':'zh-TW');
+}
+
+function wallPlace(row){
+  const cc = (row.country||'').toUpperCase();
+  if(!cc) return '';
+  if(cc === 'TW' && row.city){
+    return '🇹🇼 ' + (LANG === 'en' ? (TW_CITY_EN[row.city] || row.city) : row.city);
+  }
+  const c = COUNTRIES[cc] || COUNTRIES.OTHER;
+  return c.em + ' ' + (c[LANG] || c.zh);
+}
+
+function wallItemHTML(row, fresh){
+  const t = TYPES[row.type_code];
+  if(!t) return '';
+  const named = !!(row.nickname && row.nickname.trim());
+  const name = named ? esc(row.nickname) : L('一位朋友','Someone','ある人');
+  const place = wallPlace(row);
+  const reported = !!WALL.reported[row.id];
+  return `<div class="w-item ${fresh?'fresh':''} ${reported?'done':''}" data-id="${row.id}">
+    <span class="w-em">${t.e}</span>
+    <div class="w-body">
+      <div class="w-name ${named?'':'anon'}">${name}</div>
+      <div class="w-meta">${esc(tName(row.type_code))}${place ? ' · ' + place : ''} · ${wallRelTime(row.created_at)}</div>
+      ${reported ? `<div class="w-reported">${L('已回報，謝謝你','Flagged — thank you','報告しました。ありがとう')}</div>` : ''}
+    </div>
+    ${reported ? '' : `<button class="w-flag" data-flag="${row.id}" title="${L('回報這一列','Flag this row','この行を報告')}" aria-label="${L('回報這一列','Flag this row','この行を報告')}">⚑</button>`}
+  </div>`;
+}
+
+function wallRender(freshIds){
+  const grid  = document.getElementById('wallGrid');
+  const empty = document.getElementById('wallEmpty');
+  const more  = document.getElementById('wallMore');
+  if(!grid) return;
+  freshIds = freshIds || {};
+
+  if(!WALL.items.length){
+    grid.innerHTML = '';
+    empty.innerHTML = `<div class="wall-empty">${
+      WALL.filter === 'mine'
+        ? L('目前還沒有人跟你同型而且公開在牆上。你可以當第一個。',
+            'Nobody with your type is on the wall yet. You could be the first.',
+            'あなたと同じタイプで公開している人はまだいません。最初のひとりになれます。')
+        : L('牆上還沒有人。做完測驗後，你可以選擇要不要公開。',
+            'The wall is empty. After the quiz you can choose whether to be public.',
+            'ウォールにはまだ誰もいません。診断のあとで公開するか選べます。')
+    } <a href="index.html${LANG==='zh'?'':'?lang='+LANG}">${L('去做測驗 →','Take the quiz →','診断へ →')}</a></div>`;
+    more.style.display = 'none';
+    return;
+  }
+
+  empty.innerHTML = '';
+  grid.innerHTML = WALL.items.map(r => wallItemHTML(r, !!freshIds[r.id])).join('');
+  grid.querySelectorAll('[data-flag]').forEach(b=>
+    b.addEventListener('click', ()=>wallReport(b.getAttribute('data-flag'))));
+
+  more.style.display = WALL.exhausted ? 'none' : 'block';
+  more.disabled = WALL.busy;
+  more.textContent = WALL.busy
+    ? L('讀取中…','Loading…','読み込み中…')
+    : L('看更多','Show more','もっと見る');
+}
+
+async function wallLoad(mode){
+  if(!window.SSQ || !SSQ.ready || WALL.busy) return;
+  WALL.busy = true;
+  const type = WALL.filter === 'mine' ? WALL.myType : null;
+  try{
+    if(mode === 'more'){
+      const last = WALL.items[WALL.items.length-1];
+      const rows = await SSQ.wall({limit: 48, type, before: last ? last.created_at : null});
+      const seen = {};
+      WALL.items.forEach(r=>seen[r.id]=1);
+      rows.forEach(r=>{ if(!seen[r.id]) WALL.items.push(r); });
+      if(rows.length < 48) WALL.exhausted = true;
+      wallRender();
+    } else {
+      const rows = await SSQ.wall({limit: 48, type});
+      const fresh = {};
+      if(mode === 'poll'){
+        const seen = {};
+        WALL.items.forEach(r=>seen[r.id]=1);
+        rows.forEach(r=>{ if(!seen[r.id]) fresh[r.id] = 1; });
+        if(!Object.keys(fresh).length){ WALL.busy = false; return; }   // 沒有新的就不要重畫
+        const tail = WALL.items.filter(r => !rows.some(x=>x.id===r.id));
+        WALL.items = rows.concat(tail);
+      } else {
+        WALL.items = rows;
+        WALL.exhausted = rows.length < 48;
+      }
+      wallRender(fresh);
+    }
+    wallUpdateCount();
+  }catch(err){
+    console.log('Wall load failed (non-blocking):', err);
+    if(mode === 'init') document.getElementById('wall').style.display = 'none';
+  }finally{
+    WALL.busy = false;
+  }
+}
+
+async function wallUpdateCount(){
+  const el = document.getElementById('wallCount');
+  if(!el) return;
+  try{
+    const n = await SSQ.wallCount(WALL.filter === 'mine' ? WALL.myType : null);
+    if(n === null){ el.textContent = ''; return; }
+    el.textContent = L(n.toLocaleString()+' 位在牆上', n.toLocaleString()+' on the wall', n.toLocaleString()+'人がウォールに');
+  }catch(e){ el.textContent = ''; }
+}
+
+async function wallReport(id){
+  const ok = window.confirm(L(
+    '要回報這一列嗎？累積到門檻會自動下架，再由人工複查。',
+    'Flag this row? Enough flags auto-hide it pending human review.',
+    'この行を報告しますか？一定数で自動的に非表示になり、その後に人が確認します。'));
+  if(!ok) return;
+  try{
+    await SSQ.report(id);
+    WALL.reported[id] = 1;
+    wallRender();
+    showToast(L('已經回報了，謝謝你','Flagged — thank you','報告しました。ありがとうございます'));
+  }catch(err){
+    console.log('report failed', err);
+    showToast(L('回報失敗，請稍後再試','Could not flag — please try again','報告できませんでした。あとでお試しください'));
+  }
+}
+
+function wallInit(){
+  const box = document.getElementById('wall');
+  if(!box) return;
+  if(!window.SSQ || !SSQ.ready){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+
+  try{ WALL.myType = localStorage.getItem('ssq-last-type') || null; }catch(e){}
+  if(WALL.myType && TYPES[WALL.myType]){
+    const tab = document.getElementById('wallMineTab');
+    tab.style.display = '';
+    tab.innerHTML = TYPES[WALL.myType].e + ' ' + esc(L('和我同型','Like me','同じタイプ'));
+  }
+
+  document.querySelectorAll('.wall-tab').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const f = b.getAttribute('data-wt');
+      if(f === WALL.filter) return;
+      WALL.filter = f;
+      WALL.exhausted = false;
+      document.querySelectorAll('.wall-tab').forEach(x=>x.classList.toggle('on', x===b));
+      document.getElementById('wallGrid').innerHTML = '';
+      wallLoad('init');
+    });
+  });
+  document.getElementById('wallMore').addEventListener('click', ()=>wallLoad('more'));
+
+  wallLoad('init');
+  setInterval(()=>wallLoad('poll'), 30000);
+}
+
 /* ---------- boot ---------- */
 function banner(html, soft){
   document.getElementById('banner').innerHTML = html ? `<div class="banner ${soft?'soft':''}">${html}</div>` : '';
@@ -981,6 +1230,7 @@ async function load(){
   document.querySelectorAll('.lang-btn').forEach(b=>
     b.addEventListener('click', ()=>setLang(b.dataset.lang, true)));
   renderDetailEmpty();
+  wallInit();
   load();
   setInterval(load, 60000);
 })();

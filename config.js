@@ -21,6 +21,21 @@ window.SSQ_CONFIG = {
 
   /* 自動產生的跨國結論，另外要求的最低樣本數（還要通過兩比例 z 檢定）。
      Higher bar for the auto-generated cross-country claim; also z-tested. */
-  INSIGHT_MIN: 30
+  INSIGHT_MIN: 30,
+
+  /* ----------------------------------------------------------
+     世界牆（Phase 1）· Supabase
+     ----------------------------------------------------------
+     從 Supabase 專案的 Settings → API 取得這兩個值。
+
+     ⚠️ 這裡只能放 anon / publishable key。它「本來就是公開的」，
+        跟著網頁一起發給每個訪客，安全性靠資料庫的 RLS，不是靠藏起來。
+     🚫 service_role / secret key 絕對不能放進這個檔案，
+        那把鑰匙會繞過所有 RLS。它只該留在你自己的機器上。
+
+     兩個值留空 → 世界牆功能整個關閉，網站其他部分照常運作。
+     ---------------------------------------------------------- */
+  SUPABASE_URL: '',
+  SUPABASE_ANON_KEY: ''
 
 };

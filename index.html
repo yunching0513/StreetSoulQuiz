@@ -791,6 +791,38 @@ body.picking #lang-pick{display:block!important}
 .sound-toggle.muted{background:var(--g4);color:var(--g2)}
 
 /* ===== ATLAS · 本次倡議最重要的成果（hero 卡） ===== */
+/* WALL JOIN · 加入世界牆（opt-in，預設不勾） */
+.wall-join{background:var(--white);border:2px solid var(--black);border-radius:20px;padding:22px 22px 20px;margin-bottom:14px;animation:fadeUp .55s cubic-bezier(.16,1,.3,1) backwards}
+.wj-label{font-family:var(--en);font-size:9.5px;font-weight:700;letter-spacing:.2em;color:#8a8a8a;margin-bottom:10px}
+.wj-title{font-size:20px;font-weight:700;line-height:1.45;margin-bottom:7px}
+.wj-sub{font-size:13px;color:#4A4A4A;line-height:1.75;margin-bottom:16px}
+.wj-preview{display:flex;align-items:center;gap:11px;border:1.5px dashed var(--black);border-radius:14px;padding:13px 15px;background:var(--cream);margin-bottom:15px}
+.wj-preview .pv-em{font-size:26px;flex-shrink:0}
+.wj-preview .pv-tx{font-size:14px;line-height:1.5;min-width:0}
+.wj-preview .pv-tx b{display:block;font-size:15px;word-break:break-word}
+.wj-preview .pv-tx span{color:#6a6a6a;font-size:12px}
+.wj-field{margin-bottom:14px}
+.wj-flabel{display:block;font-size:12.5px;font-weight:700;margin-bottom:7px}
+.wj-flabel .opt{font-family:var(--en);font-size:9.5px;font-weight:700;letter-spacing:.12em;color:#8a8a8a;margin-left:6px}
+.wj-input{width:100%;border:1.5px solid var(--black);border-radius:12px;padding:12px 14px;font-family:var(--zh);font-size:15px;background:var(--paper);outline:none}
+.wj-input:focus{box-shadow:0 0 0 3px var(--lime-soft,#E8EE8C)}
+.wj-minor{border:1.5px solid var(--g3,#D0D0D0);border-radius:12px;padding:12px 14px;font-size:12.5px;line-height:1.7;color:#4A4A4A;background:var(--paper);margin-bottom:14px}
+.wj-consent{display:flex;gap:11px;align-items:flex-start;border:1.5px solid var(--black);border-radius:14px;padding:14px 15px;background:var(--paper);cursor:pointer;margin-bottom:14px}
+.wj-consent input{width:20px;height:20px;flex-shrink:0;margin-top:1px;accent-color:var(--black);cursor:pointer}
+.wj-consent .cs-tx{font-size:12.5px;line-height:1.75;color:#333}
+.wj-consent .cs-tx b{display:block;font-size:13.5px;color:var(--black);margin-bottom:3px}
+.wj-btn{width:100%;border:2px solid var(--black);border-radius:14px;padding:15px;font-family:var(--zh);font-size:15.5px;font-weight:700;background:var(--lime);color:var(--black);cursor:pointer;transition:.2s}
+.wj-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:4px 4px 0 var(--black)}
+.wj-btn:disabled{background:var(--g4,#F0F0EC);color:#9a9a9a;border-color:#C8C8C4;cursor:not-allowed;transform:none;box-shadow:none}
+.wj-note{font-size:11.5px;color:#8a8a8a;line-height:1.7;margin-top:11px}
+.wj-done{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700;margin-bottom:10px}
+.wj-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.wj-go{flex:1;min-width:170px;display:flex;align-items:center;justify-content:space-between;gap:10px;text-decoration:none;color:var(--black);background:var(--lime);border:2px solid var(--black);border-radius:14px;padding:13px 17px;font-weight:700;font-size:14.5px;transition:.2s}
+.wj-go:hover{transform:translateY(-2px);box-shadow:4px 4px 0 var(--black)}
+.wj-undo{border:1.5px solid var(--black);border-radius:14px;padding:13px 17px;background:var(--white);font-family:var(--zh);font-size:13.5px;cursor:pointer;transition:.2s}
+.wj-undo:hover{background:var(--coral);color:var(--white)}
+.wj-err{border:1.5px solid var(--coral);background:#FFF1EF;border-radius:12px;padding:11px 14px;font-size:12.5px;line-height:1.7;color:#8a2a1e;margin-bottom:13px}
+@media (max-width:560px){.wall-join{padding:18px 16px 16px}.wj-title{font-size:18px}}
 /* WORLD PEEK · 和你同型的人在世界的哪裡（讀 Sheet CSV，失敗就整塊移除） */
 .world-peek{background:var(--white);border:1.5px solid var(--black);border-radius:20px;padding:22px 22px 20px;margin-bottom:14px;animation:fadeUp .55s cubic-bezier(.16,1,.3,1) backwards}
 .wp-label{font-family:var(--en);font-size:9.5px;font-weight:700;letter-spacing:.2em;color:var(--g2, #8a8a8a);margin-bottom:10px}
@@ -987,9 +1019,9 @@ body.picking #lang-pick{display:block!important}
     <h2 class="demo-title zh-only">兩個快速問題，幫助我們了解誰在參與</h2>
     <h2 class="demo-title en-only">Two quick questions before we begin</h2>
     <h2 class="demo-title ja-only">はじめる前に、かんたんな2つの質問</h2>
-    <p class="demo-sub zh-only">這些資訊只用於匿名統計（沒有 IP、沒有上傳）。所有欄位皆為選填，可直接略過。</p>
-    <p class="demo-sub en-only">Anonymous stats only — no IP, no upload. Every field is optional. Skip if you prefer.</p>
-    <p class="demo-sub ja-only">この情報は匿名の統計にのみ使います（IPなし・アップロードなし）。すべて任意で、スキップもできます。</p>
+    <p class="demo-sub zh-only">年齡與地區只用於匿名統計，不記錄 IP，也不會連到你個人。所有欄位皆為選填，可直接略過。</p>
+    <p class="demo-sub en-only">Age and region are used for anonymous statistics only. No IP is recorded, and nothing here identifies you. Every field is optional — skip if you prefer.</p>
+    <p class="demo-sub ja-only">年齢と地域は匿名の統計にのみ使います。IPは記録せず、個人が特定されることもありません。すべて任意で、スキップもできます。</p>
 
     <div class="demo-field">
       <label class="demo-label" for="demoNickname">
@@ -1001,9 +1033,9 @@ body.picking #lang-pick{display:block!important}
       <div class="demo-input-wrap">
         <input type="text" id="demoNickname" class="demo-input" maxlength="20" autocomplete="off" spellcheck="false" />
       </div>
-      <div class="demo-hint zh-only">如果填了，結果頁與分享圖卡會以這個名字稱呼你。只儲存在你的瀏覽器，不會上傳。</div>
-      <div class="demo-hint en-only">If filled, your result page and share card will address you by this name. Stored only in your browser, never uploaded.</div>
-      <div class="demo-hint ja-only">入力すると、結果ページとシェア画像がこの名前であなたに呼びかけます。ブラウザにのみ保存され、アップロードはされません。</div>
+      <div class="demo-hint zh-only">如果填了，結果頁與分享圖卡會以這個名字稱呼你。<b>預設只留在你的瀏覽器</b>；測驗結束後，你可以自己決定要不要把它公開在世界牆上。</div>
+      <div class="demo-hint en-only">If filled, your result page and share card will address you by this name. <b>It stays in your browser by default</b> — at the end you can choose whether to make it public on the world wall.</div>
+      <div class="demo-hint ja-only">入力すると、結果ページとシェア画像がこの名前であなたに呼びかけます。<b>初期設定ではブラウザにのみ保存</b>され、診断のあとで世界ウォールに公開するかどうかを自分で選べます。</div>
     </div>
 
     <div class="demo-field">
@@ -1128,6 +1160,7 @@ body.picking #lang-pick{display:block!important}
 <div class="toast" id="toast"></div>
 
 <script src="config.js" onerror="window.SSQ_CONFIG=window.SSQ_CONFIG||{}"></script>
+<script src="supa.js" onerror="window.SSQ=null"></script>
 <script>
 /* Trilingual helper — returns 'zh' | 'en' | 'ja' from the <body> class */
 function getLang(){return document.body.classList.contains('ja')?'ja':(document.body.classList.contains('en')?'en':'zh');}
@@ -2506,6 +2539,233 @@ function renderReadingTabs(){
 `;
 }
 
+/* 國家／地區標籤：[旗子, 中文, English, 日本語]，index 對應 1/2/3 */
+const WALL_PLACES = {
+  TW:['🇹🇼','台灣','Taiwan','台湾'], JP:['🇯🇵','日本','Japan','日本'],
+  KR:['🇰🇷','韓國','South Korea','韓国'], HK:['🇭🇰','香港','Hong Kong','香港'],
+  SG:['🇸🇬','新加坡','Singapore','シンガポール'], MY:['🇲🇾','馬來西亞','Malaysia','マレーシア'],
+  CN:['🇨🇳','中國','China','中国'], US:['🇺🇸','美國','USA','アメリカ'],
+  CA:['🇨🇦','加拿大','Canada','カナダ'], UK:['🇬🇧','英國','UK','イギリス'],
+  DE:['🇩🇪','德國','Germany','ドイツ'], FR:['🇫🇷','法國','France','フランス'],
+  NL:['🇳🇱','荷蘭','Netherlands','オランダ'], AU:['🇦🇺','澳洲','Australia','オーストラリア'],
+  OTHER:['🌍','其他地區','Elsewhere','その他の地域']
+};
+
+/* ============================
+   WALL JOIN · 加入世界牆（Phase 1）
+   ----------------------------
+   opt-in：勾選框預設不勾，沒勾就一個位元組都不會送出去。
+   未滿 18 歲：前端根本不把 nickname 放進 payload，名字不會離開這台裝置。
+   撤回：id + token 存在 localStorage，隨時可以自己刪掉那一列。
+   ============================ */
+const WALL_POSTS_KEY = 'ssq-wall-posts';
+
+function wallPostsLoad(){
+  try{
+    const a = JSON.parse(localStorage.getItem(WALL_POSTS_KEY) || '[]');
+    return Array.isArray(a) ? a : [];
+  }catch(e){ return []; }
+}
+function wallPostsSave(list){
+  try{ localStorage.setItem(WALL_POSTS_KEY, JSON.stringify(list.slice(-20))); }catch(e){}
+}
+function wallIsMinor(){
+  return demographics.age === 'under14' || demographics.age === '15-17';
+}
+function wallPlaceLabel(lang){
+  const cc = (demographics.country || '').toUpperCase();
+  const city = demographics.city || '';
+  if(cc === 'TW' && city) return '🇹🇼 ' + (lang === 'en' ? (TW_CITY_EN[city] || city) : city);
+  if(!cc) return '';
+  const p = WALL_PLACES[cc] || WALL_PLACES.OTHER;
+  return p[0] + ' ' + p[lang === 'en' ? 2 : lang === 'ja' ? 3 : 1];
+}
+
+function renderWallJoin(code){
+  // 佔位；initWallJoin() 決定要顯示什麼，或整塊移除
+  return '<div class="wall-join" id="wallJoin" style="display:none"></div>';
+}
+
+function initWallJoin(code){
+  const box = document.getElementById('wallJoin');
+  if(!box) return;
+  if(!window.SSQ || !SSQ.ready){ box.remove(); return; }   // 沒設定 Supabase 就當作沒這功能
+  box.style.display = 'block';
+  wallJoinRender(code);
+}
+
+function wallJoinRender(code, opts){
+  opts = opts || {};
+  const box = document.getElementById('wallJoin');
+  if(!box) return;
+  const lang = getLang();
+  const L = (zh,en,ja)=> lang==='ja'?ja : lang==='en'?en : zh;
+  const t = TYPES[code], tj = TYPES_JA[code] || {};
+  const tName = L(t.zh_name, t.en_name, tj.name || t.zh_name);
+  const place = wallPlaceLabel(lang);
+  const mine = wallPostsLoad().find(p => p.sid === SESSION_ID);
+  const anon = L('一位朋友','Someone','ある人');
+
+  /* ---------- 已經在牆上 ---------- */
+  if(mine){
+    const shown = mine.nickname ? escapeHtml(mine.nickname) : anon;
+    box.innerHTML =
+      '<div class="wj-done">✅ ' + L('你在牆上了','You are on the wall','ウォールに参加しました') + '</div>' +
+      '<div class="wj-sub">' + L(
+        '全世界的人都看得到這一列。你隨時可以在這裡把它撤掉。',
+        'This row is visible to everyone. You can take it down from here at any time.',
+        'この1行は世界中から見えます。いつでもここから取り下げられます。') + '</div>' +
+      wallPreviewHTML(t.emoji, shown, tName, place, L('剛剛','just now','たった今')) +
+      (opts.scrubbed ? '<div class="wj-note">' + L(
+        '（你填的名字這次沒有顯示出來，牆上會用「一位朋友」代替。）',
+        '(Your name is not being shown this time — the wall shows “Someone” instead.)',
+        '（入力した名前は今回表示されません。ウォールでは「ある人」と表示されます。）') + '</div>' : '') +
+      '<div class="wj-actions">' +
+        '<a class="wj-go" href="world.html' + (lang==='zh' ? '' : '?lang='+lang) + '#wall" onclick="SFX.pop()">' +
+          '<span>🧱 ' + L('去看世界牆','See the wall','ウォールを見る') + '</span><span>→</span></a>' +
+        '<button class="wj-undo" id="wjUndo">' + L('撤掉我的打卡','Take mine down','取り下げる') + '</button>' +
+      '</div>';
+    const undo = document.getElementById('wjUndo');
+    if(undo) undo.addEventListener('click', ()=>wallUndo(code));
+    return;
+  }
+
+  /* ---------- 還沒加入 ---------- */
+  const minor = wallIsMinor();
+  const saved = minor ? '' : (demographics.nickname || loadNickname() || '');
+
+  box.innerHTML =
+    '<div class="wj-label">JOIN THE WALL' + L(' · 加入世界牆','',' · ウォールに参加') + '</div>' +
+    '<div class="wj-title">' + L(
+      '要不要讓別人看見你？',
+      'Want to be seen?',
+      'あなたのことも、見えるようにする？') + '</div>' +
+    '<div class="wj-sub">' + L(
+      '世界牆上是全世界做過這個測驗、而且願意公開的人。這不是必要的 — 不加入，你的結果一樣完整。',
+      'The wall is for people worldwide who took this quiz and chose to be public. It is entirely optional — your result is complete either way.',
+      'ウォールには、この診断を受けて公開を選んだ世界中の人が並びます。任意です。参加しなくても結果はそのままです。') + '</div>' +
+    '<div id="wjErr"></div>' +
+    wallPreviewHTML(t.emoji, saved ? escapeHtml(saved) : anon, tName, place, L('剛剛','just now','たった今'), 'wjPv') +
+    (minor
+      ? '<div class="wj-minor">' + L(
+          '因為你未滿 18 歲，牆上不會顯示名字 — 只會顯示「' + anon + '」加上你的型態與地點。你的名字不會離開這台裝置。',
+          'Because you are under 18, no name is shown on the wall — just “' + anon + '” with your type and place. Your name never leaves this device.',
+          '18歳未満のため、ウォールに名前は表示されません。「' + anon + '」とタイプ・地域だけです。名前はこの端末から出ません。') + '</div>'
+      : '<div class="wj-field">' +
+          '<label class="wj-flabel" for="wjNick">' + L('牆上顯示的名字','Name shown on the wall','ウォールでの表示名') +
+            '<span class="opt">OPTIONAL</span></label>' +
+          '<input type="text" id="wjNick" class="wj-input" maxlength="20" autocomplete="off" spellcheck="false" value="' + escapeHtml(saved) + '" placeholder="' + L('留白就顯示「一位朋友」','Leave blank to show “Someone”','空欄なら「ある人」と表示') + '">' +
+        '</div>') +
+    '<label class="wj-consent" for="wjConsent">' +
+      '<input type="checkbox" id="wjConsent">' +
+      '<span class="cs-tx"><b>' + L('我願意把上面這一列公開','Make the row above public','上の1行を公開します') + '</b>' +
+      (minor
+        ? L('牆上只會有型態和地點，不會有名字。沒有 email、沒有 IP、不用註冊。隨時可以自己撤掉。',
+             'The wall shows only your type and your place — no name. No email, no IP, no account. You can take it down yourself at any time.',
+             'ウォールに出るのはタイプと地域だけで、名前は出ません。メールもIPもアカウントも不要です。いつでも自分で取り下げられます。')
+        : L('牆上只會有型態、地點和這個名字。沒有 email、沒有 IP、不用註冊。隨時可以自己撤掉。',
+             'The wall shows only your type, your place and that name. No email, no IP, no account. You can take it down yourself at any time.',
+             'ウォールに出るのはタイプ・地域・その名前だけ。メールもIPもアカウントも不要です。いつでも自分で取り下げられます。')) +
+      '</span></label>' +
+    '<button class="wj-btn" id="wjSubmit" disabled>' + L('加入世界牆','Join the wall','ウォールに参加する') + '</button>' +
+    '<div class="wj-note">' + L(
+      '這是這個測驗唯一一個會把資料連到「你」的地方，所以預設是關的。',
+      'This is the only place in the quiz where anything is tied to you, which is why it is off by default.',
+      'この診断で「あなた」と結びつく情報が出る唯一の場所なので、初期状態はオフです。') + '</div>';
+
+  const consent = document.getElementById('wjConsent');
+  const submit  = document.getElementById('wjSubmit');
+  const nick    = document.getElementById('wjNick');
+  if(consent && submit){
+    consent.addEventListener('change', ()=>{ submit.disabled = !consent.checked; SFX.blip(); });
+  }
+  if(nick){
+    nick.addEventListener('input', ()=>{
+      const pv = document.getElementById('wjPv');
+      if(pv) pv.textContent = sanitizeNickname(nick.value) || anon;
+    });
+  }
+  if(submit) submit.addEventListener('click', ()=>wallSubmit(code));
+}
+
+function wallPreviewHTML(emoji, name, tName, place, when, nameId){
+  return '<div class="wj-preview">' +
+    '<span class="pv-em">' + emoji + '</span>' +
+    '<span class="pv-tx">' +
+      '<b' + (nameId ? ' id="' + nameId + '"' : '') + '>' + name + '</b>' +
+      '<span>' + escapeHtml(tName) + (place ? ' · ' + place : '') + ' · ' + when + '</span>' +
+    '</span></div>';
+}
+
+async function wallSubmit(code){
+  const lang = getLang();
+  const L = (zh,en,ja)=> lang==='ja'?ja : lang==='en'?en : zh;
+  const consent = document.getElementById('wjConsent');
+  const submit  = document.getElementById('wjSubmit');
+  const errBox  = document.getElementById('wjErr');
+  if(!consent || !consent.checked || !submit) return;
+
+  submit.disabled = true;
+  submit.textContent = L('送出中…','Posting…','送信中…');
+  if(errBox) errBox.innerHTML = '';
+
+  const minor  = wallIsMinor();
+  const nickEl = document.getElementById('wjNick');
+  const nick   = minor ? '' : sanitizeNickname(nickEl ? nickEl.value : '');
+  const token  = SSQ.newToken();
+
+  const row = {
+    type_code:   code,
+    country:     demographics.country || null,
+    city:        (demographics.country === 'TW' && demographics.city) ? demographics.city : null,
+    lang:        lang,
+    session_id:  SESSION_ID,
+    owner_token: token
+  };
+  if(nick) row.nickname = nick;      // 未成年或留白時，這個欄位根本不存在
+
+  try{
+    const saved = await SSQ.addSoul(row);
+    const posts = wallPostsLoad();
+    posts.push({id: saved.id, token: token, sid: SESSION_ID, code: code, nickname: saved.nickname || '', at: Date.now()});
+    wallPostsSave(posts);
+    if(nick) saveNickname(nick);
+    SFX.reveal();
+    wallJoinRender(code, {scrubbed: !!nick && !saved.nickname});
+  }catch(err){
+    console.log('Wall join failed:', err);
+    submit.disabled = false;
+    submit.textContent = L('再試一次','Try again','もう一度');
+    if(errBox){
+      errBox.innerHTML = '<div class="wj-err">' + L(
+        '送出失敗，你的結果沒有受到影響。等一下再試一次就好。',
+        'Could not post. Your result is unaffected — try again in a moment.',
+        '送信できませんでした。結果には影響ありません。少し時間をおいて再度お試しください。') + '</div>';
+    }
+  }
+}
+
+async function wallUndo(code){
+  const lang = getLang();
+  const L = (zh,en,ja)=> lang==='ja'?ja : lang==='en'?en : zh;
+  const posts = wallPostsLoad();
+  const i = posts.findIndex(p => p.sid === SESSION_ID);
+  if(i < 0) return;
+  const btn = document.getElementById('wjUndo');
+  if(btn){ btn.disabled = true; btn.textContent = L('撤除中…','Removing…','削除中…'); }
+  try{
+    await SSQ.removeSoul(posts[i].id, posts[i].token);
+    posts.splice(i, 1);
+    wallPostsSave(posts);
+    wallJoinRender(code);
+    showToast(L('已經把你的打卡撤掉了','Your post has been removed','ウォールから取り下げました'));
+  }catch(err){
+    console.log('Wall undo failed:', err);
+    if(btn){ btn.disabled = false; btn.textContent = L('再試一次','Try again','もう一度'); }
+    showToast(L('撤除失敗，請稍後再試','Could not remove — please try again','削除できませんでした。あとでお試しください'));
+  }
+}
+
 /* ============================
    WORLD PEEK · 和你同型的人在世界的哪裡
    讀 dashboard/world 共用的 Sheet CSV（彙總統計，無個資）。
@@ -2545,16 +2805,7 @@ async function loadWorldPeek(code){
     drop(); return;
   }
 
-  const PLACES = {
-    TW:['🇹🇼','台灣','Taiwan','台湾'], JP:['🇯🇵','日本','Japan','日本'],
-    KR:['🇰🇷','韓國','South Korea','韓国'], HK:['🇭🇰','香港','Hong Kong','香港'],
-    SG:['🇸🇬','新加坡','Singapore','シンガポール'], MY:['🇲🇾','馬來西亞','Malaysia','マレーシア'],
-    CN:['🇨🇳','中國','China','中国'], US:['🇺🇸','美國','USA','アメリカ'],
-    CA:['🇨🇦','加拿大','Canada','カナダ'], UK:['🇬🇧','英國','UK','イギリス'],
-    DE:['🇩🇪','德國','Germany','ドイツ'], FR:['🇫🇷','法國','France','フランス'],
-    NL:['🇳🇱','荷蘭','Netherlands','オランダ'], AU:['🇦🇺','澳洲','Australia','オーストラリア'],
-    OTHER:['🌍','其他地區','Elsewhere','その他の地域']
-  };
+  const PLACES = WALL_PLACES;
   const lang = getLang();
   const pick = (zh,en,ja)=> lang==='en' ? en : lang==='ja' ? ja : zh;
   const li = lang==='en' ? 2 : lang==='ja' ? 3 : 1;
@@ -2765,6 +3016,8 @@ function showResult(){
 
       ${renderWorldPeek(code)}
 
+      ${renderWallJoin(code)}
+
       <div class="share-section">
         <div class="s-label">SHARE · <span class="zh-only">分享你的街道靈魂</span><span class="en-only">分享你的街道靈魂</span><span class="ja-only">あなたの街の魂をシェア</span></div>
         <h3 class="s-title zh-only">把這個結果分享出去</h3>
@@ -2929,6 +3182,8 @@ function showResult(){
     `;
     showScreen('result');
     loadWorldPeek(code);
+    initWallJoin(code);
+    try{ localStorage.setItem('ssq-last-type', code); }catch(e){}
     SFX.reveal();
     window.scrollTo({top:0,behavior:'smooth'});
   }, 1300);
