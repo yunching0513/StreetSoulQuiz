@@ -147,7 +147,7 @@ tr.hidden-row td{color:var(--g1)}
   <div class="foot">
     第一次設定：Supabase → Authentication → Users → Add user 建一個帳號，
     然後到 SQL Editor 執行
-    <code>insert into public.moderators (user_id) values ('&lt;那個帳號的 uid&gt;');</code><br>
+    <code>insert into public.wall_moderators (user_id) values ('&lt;那個帳號的 uid&gt;');</code><br>
     這一頁只有審核功能，不會顯示 IP、email 或任何統計以外的個人資料 — 因為資料庫裡本來就沒有存。
   </div>
 </div>
@@ -210,11 +210,11 @@ async function doLogin(){
   try{
     const r = await SSQ.signIn(email, pass);
     TOKEN = r.access_token;
-    const isMod = await SSQ.rpc('is_moderator', {}, TOKEN);
+    const isMod = await SSQ.rpc('wall_is_moderator', {}, TOKEN);
     if(!isMod){
       TOKEN = null;
       msg('loginMsg', '這個帳號登入成功，但還不是管理員。請在 Supabase 的 SQL Editor 執行：<br>' +
-        '<code>insert into public.moderators (user_id) values (\'' + esc(r.user.id) + '\');</code>');
+        '<code>insert into public.wall_moderators (user_id) values (\'' + esc(r.user.id) + '\');</code>');
       btn.disabled = false; btn.textContent = '登入';
       return;
     }
@@ -246,7 +246,7 @@ async function loadFeed(){
   const wrap = document.getElementById('feedWrap');
   wrap.innerHTML = '<div class="empty">讀取中…</div>';
   try{
-    const rows = await SSQ.rpc('moderation_feed',
+    const rows = await SSQ.rpc('wall_moderation_feed',
       {p_limit: 300, p_only_flagged: FILTER === 'flagged'}, TOKEN) || [];
     document.getElementById('feedCount').textContent = rows.length + ' 筆';
     if(!rows.length){
@@ -290,9 +290,9 @@ async function act(kind, id, btn){
   if(kind === 'clear' && !confirm('把這筆的名字清掉？打卡本身會留在牆上。')) return;
   btn.disabled = true;
   try{
-    if(kind === 'hide')  await SSQ.rpc('set_soul_status', {p_id:id, p_status:'hidden'},  TOKEN);
-    if(kind === 'show')  await SSQ.rpc('set_soul_status', {p_id:id, p_status:'visible'}, TOKEN);
-    if(kind === 'clear') await SSQ.rpc('clear_nickname',  {p_id:id}, TOKEN);
+    if(kind === 'hide')  await SSQ.rpc('wall_set_status', {p_id:id, p_status:'hidden'},  TOKEN);
+    if(kind === 'show')  await SSQ.rpc('wall_set_status', {p_id:id, p_status:'visible'}, TOKEN);
+    if(kind === 'clear') await SSQ.rpc('wall_clear_nickname',  {p_id:id}, TOKEN);
     await loadFeed();
   }catch(err){
     btn.disabled = false;
@@ -305,7 +305,7 @@ async function loadTerms(){
   msg('termMsg','');
   const el = document.getElementById('termList');
   try{
-    const rows = await SSQ.rpc('list_blocked_terms', {}, TOKEN) || [];
+    const rows = await SSQ.rpc('wall_list_blocked_terms', {}, TOKEN) || [];
     el.innerHTML = rows.length
       ? rows.map(t=>'<span class="term" title="' + esc(t.note||'') + '">' + esc(t.term) +
           '<button data-term="' + esc(t.term) + '" aria-label="移除">×</button></span>').join('')
@@ -323,7 +323,7 @@ async function addTerm(){
   const btn = document.getElementById('addTerm');
   btn.disabled = true;
   try{
-    await SSQ.rpc('add_blocked_term', {p_term: t.value.trim(), p_note: n.value.trim() || null}, TOKEN);
+    await SSQ.rpc('wall_add_blocked_term', {p_term: t.value.trim(), p_note: n.value.trim() || null}, TOKEN);
     t.value = ''; n.value = '';
     await loadTerms();
   }catch(err){ msg('termMsg','新增失敗：' + esc(err.message)); }
@@ -331,7 +331,7 @@ async function addTerm(){
 }
 async function removeTerm(term){
   try{
-    await SSQ.rpc('remove_blocked_term', {p_term: term}, TOKEN);
+    await SSQ.rpc('wall_remove_blocked_term', {p_term: term}, TOKEN);
     await loadTerms();
   }catch(err){ msg('termMsg','移除失敗：' + esc(err.message)); }
 }
@@ -357,7 +357,7 @@ async function removeTerm(term){
   try{ saved = sessionStorage.getItem(TOKEN_KEY); }catch(e){}
   if(saved){
     TOKEN = saved;
-    SSQ.rpc('is_moderator', {}, TOKEN)
+    SSQ.rpc('wall_is_moderator', {}, TOKEN)
       .then(ok => ok ? enterApp() : (TOKEN = null, document.getElementById('loginCard').style.display='block'))
       .catch(()=>{ TOKEN = null; document.getElementById('loginCard').style.display='block'; });
   } else {

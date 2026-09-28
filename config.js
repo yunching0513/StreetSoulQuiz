@@ -35,7 +35,7 @@ window.SSQ_CONFIG = {
 
      兩個值留空 → 世界牆功能整個關閉，網站其他部分照常運作。
      ---------------------------------------------------------- */
-  SUPABASE_URL: '',
-  SUPABASE_ANON_KEY: ''
+  SUPABASE_URL: 'https://oyovybexcthrfyujjasz.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_aFC2bssu5YCEOR14gzdYwQ_PlCaDnVq'
 
 };

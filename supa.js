@@ -51,7 +51,9 @@ window.SSQ = (function(){
 
     /* 打卡。row 只帶使用者同意公開的欄位。 */
     async addSoul(row){
-      const out = await request('/rest/v1/souls', {
+      // 明確指定回傳欄位：owner_token 沒有授權給 anon，
+      // 不指定的話 PostgREST 可能會想回傳整列而撞上欄位權限。
+      const out = await request('/rest/v1/wall_souls?select=' + WALL_COLS, {
         method: 'POST',
         headers: headers(null, {'Prefer': 'return=representation'}),
         body: JSON.stringify(row)
@@ -61,7 +63,7 @@ window.SSQ = (function(){
 
     /* 讀牆。type 給 4 碼就只看同型的。 */
     async wall({limit = 48, before = null, type = null} = {}){
-      let q = '/rest/v1/souls?select=' + WALL_COLS + '&order=created_at.desc&limit=' + limit;
+      let q = '/rest/v1/wall_souls?select=' + WALL_COLS + '&order=created_at.desc&limit=' + limit;
       if(type) q += '&type_code=eq.' + encodeURIComponent(type);
       if(before) q += '&created_at=lt.' + encodeURIComponent(before);
       return await request(q, {headers: headers()}) || [];
@@ -70,7 +72,7 @@ window.SSQ = (function(){
     /* 牆上總共幾筆（PostgREST 用 Content-Range 回總數）。 */
     async wallCount(type){
       if(!ready) throw new Error('wall not configured');
-      let q = '/rest/v1/souls?select=id&limit=1';
+      let q = '/rest/v1/wall_souls?select=id&limit=1';
       if(type) q += '&type_code=eq.' + encodeURIComponent(type);
       const res = await fetch(BASE + q, {headers: headers(null, {'Prefer': 'count=exact'})});
       if(!res.ok) throw new Error('HTTP ' + res.status);
@@ -80,13 +82,13 @@ window.SSQ = (function(){
     },
 
     async report(id){
-      return request('/rest/v1/rpc/report_soul', {
+      return request('/rest/v1/rpc/wall_report_soul', {
         method: 'POST', headers: headers(), body: JSON.stringify({p_id: id})
       });
     },
 
     async removeSoul(id, token){
-      return request('/rest/v1/rpc/delete_soul', {
+      return request('/rest/v1/rpc/wall_delete_soul', {
         method: 'POST', headers: headers(), body: JSON.stringify({p_id: id, p_token: token})
       });
     },

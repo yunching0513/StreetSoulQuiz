@@ -117,13 +117,29 @@
 
 ### 世界牆的 Supabase 設定
 
-1. 開一個 Supabase 專案（free 方案即可）。
-2. SQL Editor 執行 `supabase/migrations/20260918000000_street_soul_wall.sql`。
-3. Settings → API 複製 **Project URL** 與 **anon / publishable key**，填進 `config.js`。
-   anon key 本來就是公開的，安全性靠 RLS；**service_role key 絕對不要放進 `config.js`**。
-4. 建管理員：Authentication → Users → Add user 建帳號，再到 SQL Editor 執行
-   `insert into public.moderators (user_id) values ('<那個帳號的 uid>');`
-5. 到 `/moderate.html` 用該帳號登入。
+目前接的是既有的 `strata` 專案（free 方案每個 owner 只能有 2 個 active 專案，已經滿了）。
+所有表與函式都加了 `wall_` 前綴，跟該專案原本的東西分開，日後要整批搬走也容易。
+
+要在新專案重建時：
+
+1. SQL Editor 執行 `supabase/migrations/20260918000000_street_soul_wall.sql`。
+2. Settings → API 複製 **Project URL** 與 **publishable key**，填進 `config.js`。
+   這把 key 本來就是公開的，安全性靠 RLS 與 column-level grant，不是靠藏起來；
+   **service_role / secret key 絕對不要放進 `config.js`**。
+3. 建管理員：Authentication → Users → Add user 建帳號，再到 SQL Editor 執行
+   ```sql
+   insert into public.wall_moderators (user_id)
+   select id from auth.users where email = '你的管理員 email';
+   ```
+4. 到 `/moderate.html` 用該帳號登入。
+5. 建議一併開啟 Authentication → Policies 的 leaked password protection
+   （審核台是密碼登入，這個保護值得開）。
+
+> **跟別的應用共用專案要注意**：publishable key 會跟著網頁發給每個訪客。
+> 同一個專案裡任何一張沒開 RLS 的表，等於對全世界公開。
+> `strata` 目前所有表都已啟用 RLS，而且它有一個 `rls_auto_enable` event trigger
+> 會自動替新建的表開 RLS，所以風險可控 — 但之後在那個專案加表時，
+> 請記得確認 RLS 與 policy。
 
 完整設定教學請洽專案維護者。
 

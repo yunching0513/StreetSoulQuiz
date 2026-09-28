@@ -184,15 +184,60 @@ Phase 2（自由文字）的既有共識，動手前先讀：留言框用**引�
 - 撤回流程：牆上消失 + localStorage 清掉 + 資料庫該列不存在
 - 審核台：登入、列表、下架、放回、清名字、封鎖字新增刪除
 
-### 🚧 還沒完成的一件事
+### 🔌 已接上的 Supabase（2026-09-19）
 
-**Supabase 專案還沒開。** free 方案每個 owner 最多 2 個 active 專案，
-`strata` 與 `schoolzone` 已經佔滿，所以 `create_project` 被擋。
-要接上得先選一條路：暫停其中一個、把表建在現有專案裡、或升級 Pro。
-在那之前 `config.js` 的兩個 Supabase 欄位留空，世界牆功能整塊隱藏，
-網站其他部分完全正常。
+free 方案開不了新專案（每個 owner 最多 2 個 active，`strata` 與 `schoolzone` 佔滿），
+所以**寄生在既有的 `strata` 專案**裡。
 
-接上之後只要三步：跑 migration → 貼 URL/anon key → 建管理員帳號（見 README）。
+| 項目 | 值 |
+|------|-----|
+| 專案 | `strata`（ref `oyovybexcthrfyujjasz`，ap-northeast-1） |
+| URL | `https://oyovybexcthrfyujjasz.supabase.co` |
+| key | publishable key，已填進 `config.js`（公開是設計如此，靠 RLS 擋） |
+
+**為什麼不是 `schoolzone`**：那裡面是兒少研究專案（4,336 所學校、participants、
+consent_records，表上還註明禁止存姓名學號）。把一個要公開在 GitHub 上的 key
+跟它放同一個專案不合適。
+
+**所有表與函式都加了 `wall_` 前綴**（`wall_souls` / `wall_blocked_terms` /
+`wall_moderators`、`wall_*` 函式），因為 schema 跟別的應用共用。
+
+### ⚠️ 只有在真實 Supabase 上才會發現的雷
+
+**Supabase 對 public schema 設了 default privileges，會把新函式的 EXECUTE
+直接給 anon / authenticated。** 所以光是 `revoke execute ... from public`
+（在乾淨的 Postgres 上夠用）在 Supabase 上**完全不夠** — anon 照樣叫得到
+管理者函式。migration 第 8 節現在是 `revoke ... from public, anon, authenticated`
+再逐一 grant 回去。已在線上驗證：anon 只剩 `wall_delete_soul` 與 `wall_report_soul`。
+
+這也是為什麼本機測試不能取代線上驗證。
+
+### ✅ 線上已驗證 / ❌ 還沒驗證
+
+已驗證（透過 Supabase MCP 直接查線上資料庫）：
+- 兩個 migration 都套用成功
+- anon 可讀欄位 = id, created_at, type_code, nickname, country, city, lang（**沒有 owner_token**）
+- anon 可寫欄位 = type_code, nickname, country, city, lang, session_id, owner_token（**沒有 status/reports**）
+- 三張 `wall_` 表都啟用 RLS
+- anon 可執行的函式只有 `wall_delete_soul`、`wall_report_soul`
+
+**還沒驗證（要你花兩分鐘）**：瀏覽器 → PostgREST 那一段。
+沙箱的 egress proxy 擋掉 `*.supabase.co`，我在容器裡連不到，
+而收尾時 Supabase MCP 的 SQL 連線也掛了（`postgres` 密碼認證失敗，
+專案本身是 ACTIVE_HEALTHY，是連接器端的問題）。
+前端的 HTTP 形狀有對著一個複刻 PostgREST 語意的假伺服器測過，
+但沒對真的打過。**上線前請照下面的清單走一遍。**
+
+### 📋 上線前的人工驗收清單
+
+1. 開 `index.html`，做完測驗 → 結果頁應該出現「加入世界牆」，勾選框預設不勾
+2. 勾選 → 送出 → 應該變成「你在牆上了」
+3. 開 `world.html` → 世界牆應該看得到剛剛那一列
+4. 回結果頁按「撤掉我的打卡」→ 牆上應該消失
+5. 年齡選「15–17」再測一次 → 不應該出現暱稱欄位，牆上顯示「一位朋友」
+6. 建管理員帳號後開 `moderate.html` → 登入、下架、放回、封鎖字都要能動
+
+任何一步卡住，先開瀏覽器 console 看 network 的錯誤訊息。
 
 ---
 

@@ -9,30 +9,30 @@
 --     靠 column-level GRANT 實作，不是靠前端自律。
 --  3. 審核走 security definer RPC，權限來源是 moderators 表，
 --     不是「只要登入就是管理員」。
---  4. 先顯示、後審核：送出即上牆，命中過濾規則的暱稱會被清成 null
+--  4. 表名一律 wall_ 前綴：這個 schema 可能跟別的應用共用，
+--     前綴讓命名空間乾淨，也方便日後整批搬走。
+--  5. 先顯示、後審核：送出即上牆，命中過濾規則的暱稱會被清成 null
 --     （貼文照樣在，只是不顯示名字），不給使用者錯誤訊息去學怎麼規避。
 -- ============================================================
-
-create extension if not exists pgcrypto;
 
 -- ------------------------------------------------------------
 -- 1. 暱稱封鎖字清單（管理者自己維護，不需要改程式碼）
 -- ------------------------------------------------------------
-create table if not exists public.blocked_terms (
+create table if not exists public.wall_blocked_terms (
   term       text primary key,
   note       text,
   created_at timestamptz not null default now()
 );
 
-comment on table public.blocked_terms is
+comment on table public.wall_blocked_terms is
   '暱稱過濾字串。命中的暱稱會被清成 null，貼文照樣上牆。刻意從空的開始：請依實際遇到的狀況自行補充，不要預先把髒話清單寫進公開的 repo。';
 
-alter table public.blocked_terms enable row level security;   -- 一般人完全讀不到
+alter table public.wall_blocked_terms enable row level security;   -- 一般人完全讀不到
 
 -- ------------------------------------------------------------
 -- 2. 打卡本體
 -- ------------------------------------------------------------
-create table if not exists public.souls (
+create table if not exists public.wall_souls (
   id                uuid primary key default gen_random_uuid(),
   created_at        timestamptz not null default now(),
 
@@ -57,15 +57,15 @@ create table if not exists public.souls (
   owner_token       text not null check (char_length(owner_token) between 16 and 64)
 );
 
-comment on table public.souls is '世界牆上的打卡。彙總統計仍走 Google Sheet，這裡只存使用者主動同意公開的內容。';
+comment on table public.wall_souls is '世界牆上的打卡。彙總統計仍走 Google Sheet，這裡只存使用者主動同意公開的內容。';
 
-create index if not exists souls_wall_idx on public.souls (created_at desc) where status = 'visible';
-create index if not exists souls_type_idx on public.souls (type_code, created_at desc) where status = 'visible';
+create index if not exists wall_souls_recent_idx on public.wall_souls (created_at desc) where status = 'visible';
+create index if not exists wall_souls_type_idx on public.wall_souls (type_code, created_at desc) where status = 'visible';
 
 -- ------------------------------------------------------------
 -- 3. 暱稱過濾 trigger
 -- ------------------------------------------------------------
-create or replace function public.scrub_nickname()
+create or replace function public.wall_scrub_nickname()
 returns trigger
 language plpgsql
 security definer
@@ -103,7 +103,7 @@ begin
 
   -- (d) 管理者自訂清單
   if not hit and exists (
-    select 1 from public.blocked_terms b
+    select 1 from public.wall_blocked_terms b
     where b.term <> '' and probe like '%' || lower(b.term) || '%'
   ) then
     hit := true;
@@ -118,52 +118,52 @@ begin
 end;
 $$;
 
-drop trigger if exists souls_scrub_nickname on public.souls;
-create trigger souls_scrub_nickname
-  before insert or update of nickname on public.souls
-  for each row execute function public.scrub_nickname();
+drop trigger if exists wall_souls_scrub_nickname on public.wall_souls;
+create trigger wall_souls_scrub_nickname
+  before insert or update of nickname on public.wall_souls
+  for each row execute function public.wall_scrub_nickname();
 
 -- ------------------------------------------------------------
 -- 4. 管理者名冊
 -- ------------------------------------------------------------
-create table if not exists public.moderators (
+create table if not exists public.wall_moderators (
   user_id  uuid primary key references auth.users(id) on delete cascade,
   added_at timestamptz not null default now()
 );
-alter table public.moderators enable row level security;
+alter table public.wall_moderators enable row level security;
 
-create or replace function public.is_moderator()
+create or replace function public.wall_is_moderator()
 returns boolean
 language sql
 stable
 security definer
 set search_path = public
 as $$
-  select exists (select 1 from public.moderators m where m.user_id = auth.uid());
+  select exists (select 1 from public.wall_moderators m where m.user_id = auth.uid());
 $$;
 
 -- ------------------------------------------------------------
 -- 5. 權限：前端只碰得到安全欄位
 -- ------------------------------------------------------------
-alter table public.souls enable row level security;
+alter table public.wall_souls enable row level security;
 
-revoke all on public.souls from anon, authenticated;
+revoke all on public.wall_souls from anon, authenticated;
 
 -- 讀：不含 owner_token、session_id、nickname_scrubbed、status、reports
 grant select (id, created_at, type_code, nickname, country, city, lang)
-  on public.souls to anon, authenticated;
+  on public.wall_souls to anon, authenticated;
 
 -- 寫：不含 status / reports / nickname_scrubbed（只能吃預設值）
 grant insert (type_code, nickname, country, city, lang, session_id, owner_token)
-  on public.souls to anon, authenticated;
+  on public.wall_souls to anon, authenticated;
 
-drop policy if exists "read visible souls" on public.souls;
-create policy "read visible souls" on public.souls
+drop policy if exists "read visible souls" on public.wall_souls;
+create policy "read visible souls" on public.wall_souls
   for select to anon, authenticated
   using (status = 'visible');
 
-drop policy if exists "anyone may add one soul" on public.souls;
-create policy "anyone may add one soul" on public.souls
+drop policy if exists "anyone may add one soul" on public.wall_souls;
+create policy "anyone may add one soul" on public.wall_souls
   for insert to anon, authenticated
   with check (true);
 
@@ -172,7 +172,7 @@ create policy "anyone may add one soul" on public.souls
 -- ------------------------------------------------------------
 
 -- 撤掉自己的打卡（憑 localStorage 裡的 token）
-create or replace function public.delete_soul(p_id uuid, p_token text)
+create or replace function public.wall_delete_soul(p_id uuid, p_token text)
 returns boolean
 language plpgsql
 security definer
@@ -181,7 +181,7 @@ as $$
 declare
   n integer;
 begin
-  delete from public.souls where id = p_id and owner_token = p_token;
+  delete from public.wall_souls where id = p_id and owner_token = p_token;
   get diagnostics n = row_count;
   return n > 0;
 end;
@@ -190,7 +190,7 @@ $$;
 -- 檢舉。累積到門檻就自動下架，管理者可以再放回來。
 -- 這確實可以被濫用來惡意下架，但對一個 NGO 來說「誤藏」的代價遠低於
 -- 「歧視字眼掛在牆上三小時」，所以刻意選這邊。
-create or replace function public.report_soul(p_id uuid)
+create or replace function public.wall_report_soul(p_id uuid)
 returns void
 language plpgsql
 security definer
@@ -199,7 +199,7 @@ as $$
 declare
   hide_at constant integer := 3;
 begin
-  update public.souls
+  update public.wall_souls
      set reports = reports + 1,
          status  = case when reports + 1 >= hide_at then 'hidden' else status end
    where id = p_id and status = 'visible';
@@ -209,7 +209,7 @@ $$;
 -- ------------------------------------------------------------
 -- 7. RPC：管理者專用（權限在函式裡檢查，不是「登入就算」）
 -- ------------------------------------------------------------
-create or replace function public.moderation_feed(p_limit integer default 100, p_only_flagged boolean default false)
+create or replace function public.wall_moderation_feed(p_limit integer default 100, p_only_flagged boolean default false)
 returns table (
   id uuid, created_at timestamptz, type_code text,
   nickname text, nickname_scrubbed boolean,
@@ -221,7 +221,7 @@ security definer
 set search_path = public
 as $$
 begin
-  if not public.is_moderator() then
+  if not public.wall_is_moderator() then
     raise exception 'not a moderator' using errcode = '42501';
   end if;
   return query
@@ -229,115 +229,120 @@ begin
            s.nickname, s.nickname_scrubbed,
            s.country, s.city, s.lang,
            s.status, s.reports
-      from public.souls s
+      from public.wall_souls s
      where (not p_only_flagged) or s.reports > 0 or s.status = 'hidden' or s.nickname_scrubbed
      order by s.created_at desc
      limit least(greatest(coalesce(p_limit, 100), 1), 500);
 end;
 $$;
 
-create or replace function public.set_soul_status(p_id uuid, p_status text)
+create or replace function public.wall_set_status(p_id uuid, p_status text)
 returns void
 language plpgsql
 security definer
 set search_path = public
 as $$
 begin
-  if not public.is_moderator() then
+  if not public.wall_is_moderator() then
     raise exception 'not a moderator' using errcode = '42501';
   end if;
   if p_status not in ('visible','hidden') then
     raise exception 'bad status';
   end if;
-  update public.souls set status = p_status where id = p_id;
+  update public.wall_souls set status = p_status where id = p_id;
 end;
 $$;
 
-create or replace function public.clear_nickname(p_id uuid)
+create or replace function public.wall_clear_nickname(p_id uuid)
 returns void
 language plpgsql
 security definer
 set search_path = public
 as $$
 begin
-  if not public.is_moderator() then
+  if not public.wall_is_moderator() then
     raise exception 'not a moderator' using errcode = '42501';
   end if;
-  update public.souls set nickname = null, nickname_scrubbed = true where id = p_id;
+  update public.wall_souls set nickname = null, nickname_scrubbed = true where id = p_id;
 end;
 $$;
 
-create or replace function public.list_blocked_terms()
-returns setof public.blocked_terms
+create or replace function public.wall_list_blocked_terms()
+returns setof public.wall_blocked_terms
 language plpgsql
 security definer
 set search_path = public
 as $$
 begin
-  if not public.is_moderator() then
+  if not public.wall_is_moderator() then
     raise exception 'not a moderator' using errcode = '42501';
   end if;
-  return query select * from public.blocked_terms order by created_at desc;
+  return query select * from public.wall_blocked_terms order by created_at desc;
 end;
 $$;
 
-create or replace function public.add_blocked_term(p_term text, p_note text default null)
+create or replace function public.wall_add_blocked_term(p_term text, p_note text default null)
 returns void
 language plpgsql
 security definer
 set search_path = public
 as $$
 begin
-  if not public.is_moderator() then
+  if not public.wall_is_moderator() then
     raise exception 'not a moderator' using errcode = '42501';
   end if;
   if btrim(coalesce(p_term,'')) = '' then
     raise exception 'empty term';
   end if;
-  insert into public.blocked_terms (term, note)
+  insert into public.wall_blocked_terms (term, note)
   values (lower(btrim(p_term)), p_note)
   on conflict (term) do nothing;
 end;
 $$;
 
-create or replace function public.remove_blocked_term(p_term text)
+create or replace function public.wall_remove_blocked_term(p_term text)
 returns void
 language plpgsql
 security definer
 set search_path = public
 as $$
 begin
-  if not public.is_moderator() then
+  if not public.wall_is_moderator() then
     raise exception 'not a moderator' using errcode = '42501';
   end if;
-  delete from public.blocked_terms where term = lower(btrim(p_term));
+  delete from public.wall_blocked_terms where term = lower(btrim(p_term));
 end;
 $$;
 
 -- ------------------------------------------------------------
 -- 8. 函式執行權限
 -- ------------------------------------------------------------
--- Postgres 建立函式時預設就把 EXECUTE 給 PUBLIC，所以一定要先收回來，
--- 否則下面的 grant 等於沒做事。管理者函式內部雖然都有檢查 moderators，
--- 但權限該收在門口，不是只靠函式裡那一行 if。
-revoke execute on function public.scrub_nickname()                    from public;
-revoke execute on function public.delete_soul(uuid, text)             from public;
-revoke execute on function public.report_soul(uuid)                   from public;
-revoke execute on function public.is_moderator()                      from public;
-revoke execute on function public.moderation_feed(integer, boolean)   from public;
-revoke execute on function public.set_soul_status(uuid, text)         from public;
-revoke execute on function public.clear_nickname(uuid)                from public;
-revoke execute on function public.list_blocked_terms()                from public;
-revoke execute on function public.add_blocked_term(text, text)        from public;
-revoke execute on function public.remove_blocked_term(text)           from public;
+-- 兩層預設權限都要收掉，缺一不可：
+--  (1) Postgres 本身建立函式時就把 EXECUTE 給 PUBLIC
+--  (2) Supabase 另外對 public schema 設了 default privileges，
+--      會把新函式的 EXECUTE 直接給 anon / authenticated
+-- 只收 (1) 的話，在 Supabase 上 anon 照樣叫得到管理者函式。
+-- 管理者函式內部雖然都有 wall_is_moderator() 檢查，但權限要收在門口。
+revoke execute on function public.wall_scrub_nickname()                  from public, anon, authenticated;
+revoke execute on function public.wall_delete_soul(uuid, text)           from public, anon, authenticated;
+revoke execute on function public.wall_report_soul(uuid)                 from public, anon, authenticated;
+revoke execute on function public.wall_is_moderator()                    from public, anon, authenticated;
+revoke execute on function public.wall_moderation_feed(integer, boolean) from public, anon, authenticated;
+revoke execute on function public.wall_set_status(uuid, text)            from public, anon, authenticated;
+revoke execute on function public.wall_clear_nickname(uuid)              from public, anon, authenticated;
+revoke execute on function public.wall_list_blocked_terms()              from public, anon, authenticated;
+revoke execute on function public.wall_add_blocked_term(text, text)      from public, anon, authenticated;
+revoke execute on function public.wall_remove_blocked_term(text)         from public, anon, authenticated;
 
-grant execute on function public.delete_soul(uuid, text) to anon, authenticated;
-grant execute on function public.report_soul(uuid)        to anon, authenticated;
+-- 使用者自己能做的兩件事
+grant execute on function public.wall_delete_soul(uuid, text) to anon, authenticated;
+grant execute on function public.wall_report_soul(uuid)       to anon, authenticated;
 
-grant execute on function public.is_moderator()                        to authenticated;
-grant execute on function public.moderation_feed(integer, boolean)     to authenticated;
-grant execute on function public.set_soul_status(uuid, text)           to authenticated;
-grant execute on function public.clear_nickname(uuid)                  to authenticated;
-grant execute on function public.list_blocked_terms()                  to authenticated;
-grant execute on function public.add_blocked_term(text, text)          to authenticated;
-grant execute on function public.remove_blocked_term(text)             to authenticated;
+-- 只有登入者才碰得到（進去之後還要過 wall_is_moderator）
+grant execute on function public.wall_is_moderator()                        to authenticated;
+grant execute on function public.wall_moderation_feed(integer, boolean)     to authenticated;
+grant execute on function public.wall_set_status(uuid, text)           to authenticated;
+grant execute on function public.wall_clear_nickname(uuid)                  to authenticated;
+grant execute on function public.wall_list_blocked_terms()                  to authenticated;
+grant execute on function public.wall_add_blocked_term(text, text)          to authenticated;
+grant execute on function public.wall_remove_blocked_term(text)             to authenticated;
