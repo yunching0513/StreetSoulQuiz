@@ -241,6 +241,59 @@ consent_records，表上還註明禁止存姓名學號）。把一個要公開�
 
 ---
 
+## 🚶 2.8 造訪人數計數器（2026-09-29）
+
+首頁「開始測驗」按鈕上方一顆膠囊 + `world.html` 多一格 VISITS。
+
+**為什麼要特別小心**：這個專案以前放過一個假的計數器，後來 commit `411f36f`
+把它藏掉了。所以這次的數字必須是真的，而且不能宣稱超過它實際能measure的東西。
+
+| 檔案 | 動作 |
+|------|------|
+| `supabase/migrations/20260929000000_visit_counter.sql` | **新檔**。`wall_visits` 表 + 兩支 RPC |
+| `supa.js` | 新增 `countVisit()` / `visitStats()` 與訪客 id 產生器 |
+| `index.html` | 首頁膠囊（`#visitPill`），先記錄再讀取，所以數字含自己 |
+| `world.html` | stats strip 多一格 VISITS |
+
+### 設計
+
+- 只存 **隨機 UUID ＋ 日期**。沒有 IP、UA、referrer。UUID 在訪客自己的
+  localStorage（key `ssq-visitor`），清掉就換一個新的。
+- `(visitor, day)` 當 primary key → 同一瀏覽器同一天只算一次，重新整理不會跳。
+- 前端**完全碰不到** `wall_visits` 表（`revoke all from anon`），
+  只能透過兩支 security definer RPC：`wall_log_visit` / `wall_visit_stats`。
+  讀到的是數字，不是任何一列資料。
+- 首頁的渲染要等使用者選完語言（文案分三語，`getLang()` 在選語言前不準），
+  但網路請求一載入就開始跑，所以看起來不會慢。
+
+### ⚠️ 已知限制（不要假裝沒有）
+
+- 這是「造訪過的瀏覽器數」的估計值，**不是精確人數**。換裝置、無痕、清資料都會重算。
+- 理論上可以被腳本灌水（一直送新 UUID）。不加 IP 或 captcha 沒有乾淨解，
+  而不記錄 IP 的承諾比精準計數更值錢 → 刻意接受。**文案不要寫成精確人數。**
+- 真的遇到灌水：加 Cloudflare Turnstile，不要回頭去存 IP。
+
+### ✅ 已驗證（本機 Postgres 16 + 假 PostgREST + Playwright）
+
+- 同一瀏覽器同一天呼叫 3 次 → total 1
+- 跨天的同一瀏覽器不會重複計入 total；today 只算當天
+- anon 直接 select / insert / delete `wall_visits` → 全部 permission denied
+- 瀏覽器重新整理 → total 不變（6 → 6）
+- 換一個乾淨的瀏覽器 context → total +1（6 → 7）
+- 中／英／日三語文案都正確，切換語言會重新渲染
+- Supabase 設定留空 → 膠囊與 VISITS 格都整塊隱藏，其他功能照常
+
+### 🚧 還沒套到線上
+
+Supabase MCP 的資料庫連線這幾天一直不通（先是 `postgres` 密碼認證失敗，
+後來變成 connection timeout），所以這個 migration **還沒套到 `strata` 專案**。
+在套之前，計數器會安靜地不顯示，網站其他部分完全正常。
+
+套用方式：把 `supabase/migrations/20260929000000_visit_counter.sql`
+整份貼到 Supabase SQL Editor 執行即可（它是冪等的，重跑沒關係）。
+
+---
+
 ## 📋 3. 待辦 / 下一步
 
 - [ ] **commit + push**（見上方第 1 節；務必含 `git add pedestrian.png`）→ 使用者尚未確認是否上線。
@@ -250,6 +303,8 @@ consent_records，表上還註明禁止存姓名學號）。把一個要公開�
       沒填的話 `world.html` 只會顯示設定說明、結果頁的世界地圖區塊整塊隱藏 — 不會壞，但也看不到東西。
 - [ ] 觀察 Phase 0 的成效（世界地圖有沒有人點、有沒有人分享）。
 - [ ] **決定世界牆要用哪個 Supabase 專案**（見 2.7 最後一段），然後跑 migration、貼設定、建管理員。
+- [ ] **套用造訪計數器的 migration**（見 2.8 最後一段）：貼 `20260929000000_visit_counter.sql`
+      到 Supabase SQL Editor 跑一次就好。套完首頁的膠囊就會出現。
 - [ ] 上線前把 `moderate.html` 的網址只給需要的人（頁面已 `noindex`，但不是密碼保護：
       真正的防線是資料庫的 moderators 名冊，不是網址保密）。
 

@@ -248,6 +248,11 @@ h1{font-family:var(--serif);font-size:clamp(30px,5.4vw,52px);line-height:1.1;let
       <div class="stat-num" id="sTotal">—</div>
       <div class="stat-meta" id="sTotalMeta">&nbsp;</div>
     </div>
+    <div class="stat" id="visitStat" style="display:none">
+      <div class="stat-label">VISITS · <span class="zh-only">造訪人數</span><span class="en-only">VISITORS</span><span class="ja-only">訪問者数</span></div>
+      <div class="stat-num" id="sVisits">—</div>
+      <div class="stat-meta" id="sVisitsMeta">&nbsp;</div>
+    </div>
     <div class="stat">
       <div class="stat-label">PLACES · <span class="zh-only">國家／地區</span><span class="en-only">COUNTRIES</span><span class="ja-only">国・地域</span></div>
       <div class="stat-num" id="sPlaces">—</div>
@@ -538,6 +543,7 @@ function setLang(lang, persist){
   if(persist){ try{ localStorage.setItem('ssq-lang', LANG); }catch(e){} }
   if(STATE.rows) render(STATE.rows);
   if(WALL.items.length || WALL.myType){ wallRender(); wallUpdateCount(); }
+  renderVisitStat();
 }
 
 /* ---------- projection (equirectangular, matches the inline basemap) ---------- */
@@ -1174,6 +1180,37 @@ function wallInit(){
   setInterval(()=>wallLoad('poll'), 30000);
 }
 
+/* ============================================================
+   造訪人數。資料是 wall_visits：隨機 UUID ＋ 日期，沒有 IP／UA／referrer。
+   同一個瀏覽器同一天只算一次；先記錄再讀，所以數字含自己。
+   ============================================================ */
+let VISIT_STATS = null;
+
+async function loadVisitStats(){
+  if(!window.SSQ || !SSQ.ready) return;
+  try{
+    await SSQ.countVisit();
+    VISIT_STATS = await SSQ.visitStats();
+    renderVisitStat();
+  }catch(err){
+    console.log('Visit counter unavailable (non-blocking):', err);
+  }
+}
+
+function renderVisitStat(){
+  const box = document.getElementById('visitStat');
+  if(!box || !VISIT_STATS || !Number(VISIT_STATS.total)) return;
+  const total = Number(VISIT_STATS.total);
+  const today = Number(VISIT_STATS.today || 0);
+  document.getElementById('sVisits').innerHTML =
+    total.toLocaleString() + '<span class="stat-unit">' + L('人','','人') + '</span>';
+  document.getElementById('sVisitsMeta').textContent =
+    today > 0
+      ? L('今天 ' + today + ' 人', today + ' today', '今日 ' + today + ' 人')
+      : L('自上線以來','since launch','公開してから');
+  box.style.display = '';
+}
+
 /* ---------- boot ---------- */
 function banner(html, soft){
   document.getElementById('banner').innerHTML = html ? `<div class="banner ${soft?'soft':''}">${html}</div>` : '';
@@ -1231,6 +1268,7 @@ async function load(){
     b.addEventListener('click', ()=>setLang(b.dataset.lang, true)));
   renderDetailEmpty();
   wallInit();
+  loadVisitStats();
   load();
   setInterval(load, 60000);
 })();

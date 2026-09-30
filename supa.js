@@ -39,6 +39,31 @@ window.SSQ = (function(){
     return text ? JSON.parse(text) : null;
   }
 
+  /* 訪客 id：只是一個隨機 UUID，存在訪客自己的瀏覽器裡。
+     不是帳號、不跟任何身分連結，清掉瀏覽器資料就會換一個新的。 */
+  const VISITOR_KEY = 'ssq-visitor';
+  function uuid(){
+    const c = window.crypto || window.msCrypto;
+    if(c && c.randomUUID) return c.randomUUID();
+    const a = new Uint8Array(16);
+    c.getRandomValues(a);
+    a[6] = (a[6] & 0x0f) | 0x40;   // version 4
+    a[8] = (a[8] & 0x3f) | 0x80;   // variant
+    const h = Array.from(a, b => b.toString(16).padStart(2,'0')).join('');
+    return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);
+  }
+  function visitorId(){
+    try{
+      const saved = localStorage.getItem(VISITOR_KEY);
+      if(saved && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(saved)) return saved;
+      const fresh = uuid();
+      localStorage.setItem(VISITOR_KEY, fresh);
+      return fresh;
+    }catch(e){
+      return uuid();   // 無痕視窗：這次造訪照樣算得到，只是下次會是新的
+    }
+  }
+
   function newToken(){
     const a = new Uint8Array(16);
     (window.crypto || window.msCrypto).getRandomValues(a);
@@ -79,6 +104,21 @@ window.SSQ = (function(){
       const range = res.headers.get('content-range') || '';
       const total = parseInt(range.split('/')[1], 10);
       return isNaN(total) ? null : total;
+    },
+
+    /* 記一次造訪。同一個瀏覽器同一天重複呼叫不會重複計數（資料庫端擋）。 */
+    async countVisit(){
+      return request('/rest/v1/rpc/wall_log_visit', {
+        method: 'POST', headers: headers(), body: JSON.stringify({p_visitor: visitorId()})
+      });
+    },
+
+    /* 讀造訪統計。回傳 {total, today, since}。 */
+    async visitStats(){
+      const out = await request('/rest/v1/rpc/wall_visit_stats', {
+        method: 'POST', headers: headers(), body: JSON.stringify({})
+      });
+      return Array.isArray(out) ? (out[0] || null) : out;
     },
 
     async report(id){

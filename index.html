@@ -791,6 +791,13 @@ body.picking #lang-pick{display:block!important}
 .sound-toggle.muted{background:var(--g4);color:var(--g2)}
 
 /* ===== ATLAS · 本次倡議最重要的成果（hero 卡） ===== */
+/* VISIT PILL · 造訪人數（真實數字；沒接上資料庫就整塊不顯示） */
+.visit-pill{display:inline-flex;align-items:center;gap:9px;background:var(--white);border:1.5px solid var(--black);border-radius:100px;padding:8px 16px;margin-bottom:16px;font-size:13px;animation:fadeUp .5s cubic-bezier(.16,1,.3,1) backwards}
+.visit-pill .vp-dot{width:7px;height:7px;border-radius:50%;background:var(--lime-dk);box-shadow:0 0 6px var(--lime);animation:vpPulse 2.4s ease-in-out infinite;flex-shrink:0}
+@keyframes vpPulse{0%,100%{opacity:1}50%{opacity:.3}}
+.visit-pill b{font-family:var(--en);font-weight:700;font-size:14px}
+.visit-pill .vp-today{color:var(--g2, #8a8a8a);font-size:12px}
+@media (max-width:560px){.visit-pill{font-size:12px;padding:7px 13px}.visit-pill b{font-size:13px}}
 /* WALL JOIN · 加入世界牆（opt-in，預設不勾） */
 .wall-join{background:var(--white);border:2px solid var(--black);border-radius:20px;padding:22px 22px 20px;margin-bottom:14px;animation:fadeUp .55s cubic-bezier(.16,1,.3,1) backwards}
 .wj-label{font-family:var(--en);font-size:9.5px;font-weight:700;letter-spacing:.2em;color:#8a8a8a;margin-bottom:10px}
@@ -997,6 +1004,11 @@ body.picking #lang-pick{display:block!important}
         <div class="ax-q en-only">What kind of city do you see?</div>
         <div class="ax-q ja-only">どんな街が見える？</div>
       </div>
+    </div>
+
+    <div class="visit-pill" id="visitPill" style="display:none">
+      <span class="vp-dot"></span>
+      <span id="visitText"></span>
     </div>
 
     <button class="btn-primary" onclick="goDemographics()">
@@ -2552,6 +2564,49 @@ const WALL_PLACES = {
 };
 
 /* ============================
+   VISIT COUNTER · 造訪人數
+   ----------------------------
+   真實數字，來源是 Supabase 的 wall_visits：一個隨機 UUID（存在訪客
+   自己的瀏覽器）＋ 一個日期，沒有 IP、UA、referrer。同一個瀏覽器同一天
+   只算一次。先記錄再讀取，所以訪客看到的數字包含自己。
+
+   網路請求在頁面一載入就開始跑，但要等使用者選完語言才渲染
+   （文案分三語，而 getLang() 在選語言前還不準）。
+   沒接上資料庫、或任何一步失敗 → 這顆膠囊就不顯示，首頁其他部分照常。
+   ============================ */
+let VISIT_STATS = null;
+
+async function loadVisitStats(){
+  if(!window.SSQ || !SSQ.ready) return;
+  try{
+    await SSQ.countVisit();
+    VISIT_STATS = await SSQ.visitStats();
+  }catch(err){
+    console.log('Visit counter unavailable (non-blocking):', err);
+  }
+}
+
+function renderVisitPill(){
+  const pill = document.getElementById('visitPill');
+  const text = document.getElementById('visitText');
+  if(!pill || !text || !VISIT_STATS || !Number(VISIT_STATS.total)) return;
+
+  const lang = getLang();
+  const L = (zh,en,ja)=> lang==='ja'?ja : lang==='en'?en : zh;
+  const total = Number(VISIT_STATS.total).toLocaleString();
+  const today = Number(VISIT_STATS.today || 0);
+
+  text.innerHTML =
+    L('🚶 已經有 <b>'+total+'</b> 人走過這條街',
+      '🚶 <b>'+total+'</b> people have walked this street',
+      '🚶 これまで <b>'+total+'</b> 人がこの街を歩きました') +
+    (today > 0
+      ? ' <span class="vp-today">· ' + L('今天 '+today+' 人', today+' today', '今日 '+today+' 人') + '</span>'
+      : '');
+  pill.style.display = 'inline-flex';
+}
+
+/* ============================
    WALL JOIN · 加入世界牆（Phase 1）
    ----------------------------
    opt-in：勾選框預設不勾，沒勾就一個位元組都不會送出去。
@@ -3621,6 +3676,7 @@ function pickLanguage(lang){
   SFX.pick();
   document.body.classList.remove('picking');
   document.body.classList.add(lang);
+  renderVisitPill();
   // sync top bar toggle
   document.querySelectorAll('.lang-toggle button').forEach(b=>{
     b.classList.toggle('active', b.dataset.lang === lang);
@@ -3637,6 +3693,7 @@ document.querySelectorAll('.lang-toggle button').forEach(btn=>{
     const lang = btn.dataset.lang;
     document.body.classList.remove('zh','en','ja');
     document.body.classList.add(lang);
+    renderVisitPill();
   };
 });
 
@@ -3651,6 +3708,9 @@ document.getElementById('demoCountry').addEventListener('change', e=>{
   const cityField = document.getElementById('demoCity');
   cityField.style.display = e.target.value === 'TW' ? 'block' : 'none';
 });
+
+/* 造訪計數：一載入就開始送出請求，選完語言後才渲染 */
+loadVisitStats().then(renderVisitPill);
 </script>
 </body>
 </html>
